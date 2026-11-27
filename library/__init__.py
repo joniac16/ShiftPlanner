@@ -1,1 +1,1 @@
-"""ShiftPlanner: distribución automática del personal en líneas y turnos."""
+"""ShiftPlanner: automatic allocation of factory staff to lines and shifts."""

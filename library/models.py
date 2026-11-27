@@ -1,22 +1,22 @@
-"""Modelos de datos: Operario, Linea y Turno."""
+"""Data models: Operator, Line and Shift."""
 
 from dataclasses import dataclass, field
 
 
 @dataclass
-class Turno:
-    nombre: str  # p. ej. "Mañana", "Tarde", "Noche"
+class Shift:
+    name: str  # e.g. "Morning", "Afternoon", "Night"
 
 
 @dataclass
-class Operario:
+class Operator:
     id: str
-    nombre: str
-    lineas_habilitadas: list[str] = field(default_factory=list)
+    name: str
+    enabled_lines: list[str] = field(default_factory=list)
 
 
 @dataclass
-class Linea:
+class Line:
     id: str
-    nombre: str
-    personal_por_turno: int
+    name: str
+    staff_per_shift: int

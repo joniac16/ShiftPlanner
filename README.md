@@ -1,18 +1,18 @@
 # ShiftPlanner
 
-Distribución automática del personal de una fábrica en líneas y turnos, usando [Google OR-Tools](https://developers.google.com/optimization).
+Automatic allocation of factory staff to production lines and shifts, using [Google OR-Tools](https://developers.google.com/optimization).
 
-## Estructura
+## Structure
 
 ```
-library/        Funciones del proyecto (modelos, carga de JSON, solver)
-tests/          Tests unitarios (pytest); fixtures/ contiene JSON de prueba
-data/source/    Datos de entrada: operarios.json, lineas.json
-data/output/    Distribuciones generadas (JSON)
-main.py         Punto de entrada
+library/        Project functions (models, JSON loading, solver)
+tests/          Unit tests (pytest); fixtures/ holds test JSON files
+data/source/    Input data: operators.json, lines.json
+data/output/    Generated allocations (JSON)
+main.py         Entry point
 ```
 
-## Uso
+## Usage
 
 ```bash
 pip install -r requirements.txt

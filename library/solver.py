@@ -1,1 +1,1 @@
-"""Lógica de asignación de operarios a líneas y turnos con OR-Tools."""
+"""Assignment logic of operators to lines and shifts using OR-Tools."""

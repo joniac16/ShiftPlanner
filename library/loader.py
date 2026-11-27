@@ -1,1 +1,1 @@
-"""Lectura y escritura de los ficheros JSON."""
+"""Reading and writing of the JSON files."""
