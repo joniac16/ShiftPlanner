@@ -10,6 +10,7 @@ Automatic allocation of factory operators to production lines and shifts, modell
 - Python package with the project functions: `library/`.
 - Unit tests (pytest) live in `test/<module>/<function>/testX/` (`test1`, `test2`, ...: one folder per case; test1 is the valid case, the others usually error cases). Each `testX/` has a `test_X_<function>.py` file (e.g. `test_2_load_lines.py`; file names must be unique for pytest) and a `data/` folder with dummy data made for that case. `data/` mirrors the layout of the real `data/` folder (`source/`, `history/`), so the function under test receives the test's `data/` folder as its data directory. Tests must check that the function's result is coherent, and must never read the real `data/`.
 - Every new function in `library/` gets its own test folder, except the small helpers in `library/utils.py`, which have no tests (user decision).
+- Tests of functions that **write files** (e.g. `save_week`) write into their own `testX/data/` folder, so the result can be opened after the run: the test first deletes the file it is going to generate (to always start from the same state), and a `.gitignore` next to it lists that file so it is never committed.
 - Run tests with `python -m pytest` (configured in `pytest.ini`). Dependencies: `pip install -r requirements.txt`.
 - All data in the repository is simulated for now (no real personal data).
 
@@ -25,9 +26,10 @@ library/
   loader.py     Reads the JSON files into models (see "Loader" below)
   graph.py      Builds the bipartite graph from the PlanningInput (see "Solver" below)
   solver.py     Matching with NetworkX (see "Solver" below)
+  writer.py     Writes the algorithm's results: save_week -> data/history/<period>.json
 test/
   loader/<function>/testX/        test_X_<function>.py + data/ (dummy data)
-  graph/<function>/testX/, solver/<function>/testX/   same layout
+  graph/<function>/testX/, solver/<function>/testX/, writer/<function>/testX/   same layout
 data/
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
@@ -52,7 +54,7 @@ Every function takes the data folder as a parameter (`data` by default); tests p
 
 `load_planning_input` calls the other five and keeps only the history weeks **before** `period`.
 
-Tests: `test1` is the valid case of each function (expected result compared with `==`, result printed to the console); `test2`, `test3`... check each `DataError` (and that an empty history returns `[]`). Run with `python -m pytest -v -s`. Writing a planned week to the history (`save_week`) is not implemented yet.
+Tests: `test1` is the valid case of each function (expected result compared with `==`, result printed to the console); `test2`, `test3`... check each `DataError` (and that an empty history returns `[]`). Run with `python -m pytest -v -s`. Writing is in `writer.py` (see below).
 
 ## Solver (decisions)
 
@@ -97,21 +99,32 @@ Each function has its tests in `test/graph/<function>/testX/`.
 | `find_matching(graph, maximize_matches=True)` | dict slot id -> operator id (order of the slots in the graph), from `networkx.max_weight_matching(graph, maxcardinality=maximize_matches)` |
 | `build_allocation(period, matching, graph)` | `WeekAllocation`: one `Assignment` per pair, with the slot's line, shift and **role** (taken from the slot node); order of the matching |
 | `solve(data, weights=None, maximize_matches=True)` | `PlanningResult`: builds the graph, finds the matching, builds the allocation and the report. Always returns a plan; writes nothing to disk |
+| `validate_week(allocation, data)` | nothing; raises DataError if the allocation breaks a rule (see below) |
 
 `PlanningResult` (models.py), the output of `solve`: `allocation` (WeekAllocation, the week's plan), `uncovered_slots` (slot id -> number of candidate operators it had), `unassigned_operators` (available operators who got no slot), `total_weight`.
 
 In `uncovered_slots`, 0 candidates means nobody could take the slot; more than 0 means its candidates were needed elsewhere. A Hall's theorem explanation is a possible later improvement.
 
-Planned next: `save_week` in `loader.py` (validate the plan and write it to `data/history/<period>.json`).
+`validate_week(allocation, data)` (solver.py) raises DataError unless every assignment has: a known operator, assigned only once; available that week and on that shift; a line that runs that week and runs that shift; no block from the line's restricted group; a role allowed for the operator's level (`ALLOWED_ROLES`). No (line, shift, role) may have more operators than the demand; fewer is allowed.
+
+### writer.py
+
+| Function | Does |
+|---|---|
+| `save_week(allocation, data_dir, overwrite=False)` | validates with `validate_week` (against `load_planning_input` of that week) and writes `history/<period>.json` (one assignment per line). DataError if invalid (nothing written) or if the week exists and `overwrite` is False. If later weeks exist, prints a warning and saves anyway. Returns the path |
 
 Simulated week 2027-W5 with `solve`: 48 of 48 slots covered, all with the exact level (total weight 480, a few ms); 15 of the 63 available operators left unassigned.
 
 ## Workflow (planned)
 
-There is no `data/output/` folder and no separate approval step (user decision): the solver's plan for a week is saved **directly** to `data/history/<period>.json` (planned function in `loader.py`, e.g. `save_week`, which validates the allocation before writing it). To change a planned week, edit its history file.
+There is no `data/output/` folder and no separate approval step (user decision): the solver's plan for a week is saved **directly** to `data/history/<period>.json` with `writer.save_week`, which validates it first. To change a planned week, edit its history file (or save it again with `overwrite=True`).
+
+    data = load_planning_input("2027-W5")
+    result = solve(data)
+    save_week(result.allocation)
 
 - Weeks must be planned **in order**: planning week N+1 reads week N from the history (restricted groups).
-- Re-planning a week overwrites its history file; if later weeks were already planned, they were computed with the old version (to be decided: allow, warn or prevent).
+- Saving a week that already exists needs `overwrite=True`. If later weeks were already planned, `save_week` warns (they were computed with the old version) but saves anyway.
 - `main.py` is not being written for now.
 
 ## Data model

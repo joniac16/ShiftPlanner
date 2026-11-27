@@ -1,0 +1,6 @@
+{
+  "period": "2027-W6",
+  "assignments": [
+    {"operator": "OP1", "line": "L1", "shift": "Morning", "role": "qualified"}
+  ]
+}

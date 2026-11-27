@@ -1,4 +1,4 @@
-"""Reading and writing of the JSON files.
+"""Reading of the JSON files: what goes into the algorithm (writing is in writer.py).
 
 Every function takes the data folder as a parameter (`data` by default), so
 tests can use their own dummy data with the same layout:

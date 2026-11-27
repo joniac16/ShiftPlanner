@@ -1,0 +1,7 @@
+[
+  {"id": "OP1", "name": "Marie Curie", "lines": {"L1": "qualified"}},
+  {"id": "OP2", "name": "Isaac Newton", "lines": {"L2": "specialist"}},
+  {"id": "OP3", "name": "Ada Lovelace", "lines": {}},
+  {"id": "OP4", "name": "Alan Turing", "lines": {"L1": "qualified"}},
+  {"id": "OP5", "name": "Grace Hopper", "lines": {"L1": "qualified"}}
+]
