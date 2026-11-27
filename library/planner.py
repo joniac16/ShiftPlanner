@@ -1,4 +1,4 @@
-"""Plan several weeks in a row: the loop used by main.py and by a future front end.
+"""Plan several weeks in a row: the loop used by main.py and by the front end (app.py).
 
 `solver.solve` plans one week; `plan_weeks` chains several, so that each week
 sees the ones planned before it (restricted groups), and saves them all at

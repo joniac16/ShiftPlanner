@@ -15,8 +15,9 @@ Each app runs `app.py` from its branch. Changes flow `dev` -> `test` -> `main`. 
 ## Structure
 
 ```
-library/        Project functions (models, JSON loading, solver)
-test/           Unit tests (pytest): <module>/<function>/ with test file and dummy data
+library/        Project functions: models, loader (read JSON), graph (bipartite graph),
+                solver (matching), writer (save weeks), planner (plan a range of weeks), utils
+test/           Unit tests (pytest): <module>/<function>/testX/ with a test file and its dummy data
 data/           The data used by the app and main.py (for now, simulated data):
   source/       lines.json, operators.json (master data);
                 demands.json, availabilities.json (weekly data, keyed by ISO week)
@@ -45,6 +46,16 @@ Or use the web front end (screens: Plan assignments, View assignments, View sour
 
 ```bash
 streamlit run app.py
+```
+
+To go back to the starting point locally, remove the planned weeks that are not in git (the first command only lists them):
+
+```bash
+git clean -n data/history
+```
+
+```bash
+git clean -f data/history
 ```
 
 Run the tests:

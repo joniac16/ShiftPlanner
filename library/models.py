@@ -142,9 +142,9 @@ class MatchWeights:
 
 @dataclass
 class PlanningResult:
-    """What the solver returns for a week: the proposal and a short report.
+    """What the solver returns for a week: the plan and a short report.
 
-    A proposal is always returned, even if some slots could not be covered.
+    A plan is always returned, even if some slots could not be covered.
     """
 
     allocation: WeekAllocation  # the week's plan (what is saved to data/history)

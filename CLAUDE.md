@@ -14,7 +14,7 @@ Automatic allocation of factory operators to production lines and shifts, modell
 - **Never commit directly to `test` or `main`.** If a problem shows up in `test`, fix it in `dev` and merge again.
 - Claude works **only on `dev`** (user decision). Merging `dev` into `test`, or `test` into `main`, is done only when the user asks.
 - All branches contain the whole repository (code, tests, docs, this file). Production is defined by what runs (`app.py`), not by removing files; a clean package can be made with `.gitattributes` `export-ignore` + `git archive` if ever needed.
-- Planned weeks generated in `data/history/` are not committed in any branch (they would travel to `main` with the merges) unless the user asks.
+- Planned weeks generated in `data/history/` are not committed in any branch (they would travel to `main` with the merges) unless the user asks (e.g. weeks downloaded from an online app that the user wants to keep).
 
 ## Conventions
 
@@ -80,7 +80,7 @@ Tests: `test1` is the valid case of each function (expected result compared with
 ## Solver (decisions)
 
 Approach: bipartite graph, maximum-cardinality matching with maximum total weight (`networkx.max_weight_matching(G, maxcardinality=True)`): first cover as many slots as possible, then prefer the heaviest assignments. Implemented with **NetworkX only** (no own matching algorithm; `networkx` is in `requirements.txt`).
-- Planned solver signature: `solve(data, weights=None, maximize_matches=True)`. `maximize_matches=True` -> maximum number of covered slots, then maximum weight among those (`maxcardinality=True`); `False` -> maximum weight only, even if fewer slots are covered.
+- Solver signature: `solve(data, weights=None, maximize_matches=True)`. `maximize_matches=True` -> maximum number of covered slots, then maximum weight among those (`maxcardinality=True`); `False` -> maximum weight only, even if fewer slots are covered.
 
 - Left side: operators available that week (`build_operator_set`). Right side: slots, one node per position (e.g. 2 qualified needed -> 2 slots). Edges: an operator can take a slot, with a weight.
 - **Each operator covers at most one slot per week.**
@@ -108,7 +108,7 @@ Approach: bipartite graph, maximum-cardinality matching with maximum total weigh
   Usage: `build_edges(data, operator_set, slot_set, MatchWeights(specialist_slot_qualified=0.5))`. Weights only decide among matchings that cover the same number of slots: who takes each slot and, when operators are missing, which slots stay empty.
 - **Restricted groups block every role**: an operator who must rest from a group cannot go to any of its lines, not even as an assistant. Rule (`get_blocked_groups`): blocked if the last run of consecutive weeks in the group lasted at least `max_consecutive_weeks` and fewer than `min_rest_weeks` weeks have passed since it ended. A week with no history counts as not worked.
 - The history stores the **role of the slot** taken, not the operator's level.
-- New models (slots, weights) go in `models.py`.
+- New models go in `models.py` (slots and operator options are plain dicts, see graph.py).
 
 ### graph.py
 
@@ -145,11 +145,11 @@ In `uncovered_slots`, 0 candidates means nobody could take the slot; more than 0
 |---|---|
 | `save_week(allocation, data_dir, overwrite=False)` | validates with `validate_week` (against `load_planning_input` of that week) and writes `history/<period>.json` (one assignment per line). DataError if invalid (nothing written) or if the week exists and `overwrite` is False. If later weeks exist, prints a warning and saves anyway. Returns the path |
 
-Simulated week 2027-W5 with `solve`: 48 of 48 slots covered, all with the exact level (total weight 480, a few ms); 15 of the 63 available operators left unassigned.
+Simulated week 2027-W5 with `solve`: 48 of 48 slots covered, every slot taken by an operator of its own level (total weight 480, a few ms); 15 of the 63 available operators left unassigned.
 
 ## Planning several weeks (`library/planner.py`, `main.py`)
 
-`plan_weeks(start_year, start_week, end_year, end_week, data_dir="data", weights=None, maximize_matches=True, overwrite=False)` -> list of `PlanningResult` (one per week). It is the loop used by `main.py` and meant to be called directly by a future front end (weeks are given as year + week number, by user choice, to make the front end easier).
+`plan_weeks(start_year, start_week, end_year, end_week, data_dir="data", weights=None, maximize_matches=True, overwrite=False)` -> list of `PlanningResult` (one per week). It is the loop used by `main.py` and by the front end `app.py` (weeks are given as year + week number, by user choice, to make the front end easier).
 
 1. Loads the whole history into memory. If a week of the range is already in it and `overwrite` is False -> DataError before planning anything; with `overwrite`, those weeks are dropped from the in-memory history (the old versions are not used).
 2. Week by week: `load_planning_input`, replace its history with the in-memory one (weeks before it), `solve`, `validate_week`, and append the allocation to the in-memory history, so the next week sees it (restricted groups).
@@ -226,7 +226,7 @@ key and edit what changes.
 
 ## Data (`data/`) and backups
 
-- `data/` holds the real data (`source/` + `history/`); today its content is simulated. It is committed. Planning with `main.py` or `app.py` writes new history files there; do not commit them unless the user asks.
+- `data/` holds the real data (`source/` + `history/`); today its content is simulated. It is committed. Planning with `main.py` or `app.py` writes new history files there; do not commit them unless the user asks. Locally, `git clean -f data/history` removes the planned weeks that are not in git (back to the starting point); an online app is reset from the Streamlit Cloud panel (Reboot, or delete and redeploy).
 - `data/backup/1`, `2` and `3` each hold a copy of `data/source/` and `data/history/`, **to play and test with** (use one as the data folder, e.g. `data/backup/1`) without touching `data/`. To reset a backup folder, copy `source/` and `history/` back from `data/` or another untouched folder (or from git). If `data/` changes on purpose, refresh the backups if needed.
 
 Current content (simulated):
@@ -238,4 +238,4 @@ Current content (simulated):
 
 ## Ideas discussed, not implemented
 
-- Weekend shift (removed for now), fair distribution of nights using history, global night-shift rotation, operators that do not want to coincide, planning several weeks at once. These do not fit a plain bipartite matching; they are future work / limitations to mention in the thesis (a constraint solver such as OR-Tools CP-SAT would handle them).
+- Weekend shift (removed for now), fair distribution of nights using history, global night-shift rotation, operators that do not want to coincide, optimizing several weeks jointly (plan_weeks plans them one after another), a "Reset history" button in the app, a Hall's theorem explanation of uncovered slots. These do not fit a plain bipartite matching; they are future work / limitations to mention in the thesis (a constraint solver such as OR-Tools CP-SAT would handle them).

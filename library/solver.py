@@ -1,5 +1,5 @@
 """Plan a week: find the best matching in the bipartite graph built by
-`library.graph.build_graph` and turn it into a proposal.
+`library.graph.build_graph` and turn it into the week's plan.
 """
 
 import networkx as nx
