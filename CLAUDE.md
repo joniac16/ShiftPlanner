@@ -53,6 +53,9 @@ data/                             Simulated data, committed (source/ + history W
     demands.json                  Weekly data: line needs, keyed by period
     availabilities.json           Weekly data: operator shifts, keyed by period
   history/<period>.json           Planned weeks: written by the solver, read back for later weeks
+  backup/source/, backup/history/ Untouched copy of the original source/ and history/ (user request), to restore
+                                  them after experimenting. Never read or written by the code; do not plan with
+                                  data/backup as data folder.
 main.py         Command line: parses arguments and calls plan_weeks
 app.py          Front end (Streamlit): Plan, Schedule, Data and Graph screens
 ```
@@ -221,6 +224,7 @@ key and edit what changes.
 ## Sample data (`data/`)
 
 - The simulated data lives directly in `data/` and is committed. Planning with `main.py` or `app.py` writes new history files there; do not commit them unless the user asks.
+- `data/backup/` keeps the original `source/` and `history/`. To restore them: delete `data/source` and `data/history` and copy them back from `data/backup/`. If the original data ever changes on purpose, update the backup too.
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
 - Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
