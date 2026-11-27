@@ -10,7 +10,7 @@ Automatic allocation of factory staff to production lines and shifts, modelled a
 | `test` | testing | <https://shiftplanner-yyfr3xq9qox3qnm4zkqvyt.streamlit.app> |
 | `dev` | development | <https://shiftplanner-nk7dbykj2bjhw5sy6l7vug.streamlit.app> |
 
-Each app runs `app.py` from its branch. Changes flow `dev` -> `test` -> `main`. Weeks planned in an online app are lost when the app restarts.
+Each app runs `app.py` from its branch. Changes flow `dev` -> `test` -> `main`. Weeks planned in an online app are lost when the app restarts. To keep them, use the download buttons (a `.zip` with all the planned weeks, or one `.json` per week) and copy the files into `data/history/`.
 
 ## Structure
 

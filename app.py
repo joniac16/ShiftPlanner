@@ -6,8 +6,10 @@ Run it with:
 Three screens, chosen in the sidebar:
   - Plan assignments:  choose the range of weeks, the objective, overwrite
                        and weights, run `plan_weeks` and see the report of
-                       every week.
-  - View assignments:  one week of the history as a table of lines x shifts.
+                       every week; download the planned weeks (.zip, or one
+                       .json per week).
+  - View assignments:  one week of the history as a table of lines x shifts;
+                       download that week's .json.
   - View source data:  operators and their training, lines, and each week's
                        demand and availability.
 
@@ -18,6 +20,7 @@ The app only displays data and calls functions of `library/`; all the logic
 import contextlib
 import io
 import json
+import zipfile
 from dataclasses import fields
 from pathlib import Path
 
@@ -55,6 +58,20 @@ def source_weeks(data_dir: Path) -> list[str]:
 
 def shift_sort_key(shift: str):
     return (SHIFT_ORDER.index(shift) if shift in SHIFT_ORDER else len(SHIFT_ORDER), shift)
+
+
+def week_file(data_dir: Path, period: str) -> Path:
+    """Path of a planned week in the history: <data_dir>/history/<period>.json."""
+    return data_dir / "history" / f"{period}.json"
+
+
+def weeks_zip(data_dir: Path, periods: list[str]) -> bytes:
+    """A .zip with the history files of the given weeks (2027-W5.json, ...)."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for period in periods:
+            archive.write(week_file(data_dir, period), arcname=f"{period}.json")
+    return buffer.getvalue()
 
 
 def weights_form(key: str) -> MatchWeights:
@@ -100,29 +117,52 @@ def plan_screen(data_dir: Path) -> None:
 
     if weeks:
         st.caption(f"Weeks with data in source: {', '.join(weeks)}")
-    if not submitted:
-        return
 
-    printed = io.StringIO()
-    try:
-        with contextlib.redirect_stdout(printed):
-            results = plan_weeks(
-                int(start_year), int(start_week), int(end_year), int(end_week),
-                data_dir=data_dir, weights=weights,
-                maximize_matches=objective.startswith("Maximum number"), overwrite=overwrite,
-            )
-    except DataError as error:
-        st.error(str(error))
-        return
+    if submitted:
+        st.session_state.pop("last_plan", None)
+        printed = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(printed):
+                results = plan_weeks(
+                    int(start_year), int(start_week), int(end_year), int(end_week),
+                    data_dir=data_dir, weights=weights,
+                    maximize_matches=objective.startswith("Maximum number"), overwrite=overwrite,
+                )
+        except DataError as error:
+            st.error(str(error))
+            return
+        # Kept in the session so the report stays on screen when a download
+        # button reruns the page.
+        st.session_state["last_plan"] = {
+            "data_dir": str(data_dir), "results": results, "warnings": printed.getvalue().splitlines(),
+        }
 
-    for line in printed.getvalue().splitlines():
+    last_plan = st.session_state.get("last_plan")
+    if not last_plan or last_plan["data_dir"] != str(data_dir):
+        return
+    results = last_plan["results"]
+    periods = [r.allocation.period for r in results]
+
+    for line in last_plan["warnings"]:
         st.warning(line)
     st.success(f"Planned and saved {len(results)} week(s) to {data_dir / 'history'}.")
+    st.download_button(
+        f"Download planned weeks (.zip, {len(periods)} file(s))",
+        data=weeks_zip(data_dir, periods),
+        file_name=f"{periods[0]}_to_{periods[-1]}.zip" if len(periods) > 1 else f"{periods[0]}.zip",
+        mime="application/zip", type="primary", on_click="ignore",
+    )
 
     names = {o.id: o.name for o in load_operators(data_dir).values()}
     for result in results:
         allocation = result.allocation
-        st.subheader(allocation.period)
+        title, button = st.columns([4, 1], vertical_alignment="bottom")
+        title.subheader(allocation.period)
+        button.download_button(
+            "Download .json", data=week_file(data_dir, allocation.period).read_bytes(),
+            file_name=f"{allocation.period}.json", mime="application/json",
+            key=f"download-{allocation.period}", on_click="ignore",
+        )
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("Assignments", len(allocation.assignments))
         c2.metric("Uncovered slots", len(result.uncovered_slots))
@@ -147,6 +187,10 @@ def schedule_screen(data_dir: Path) -> None:
 
     period = st.selectbox("Week", [w.period for w in history], index=len(history) - 1)
     week = next(w for w in history if w.period == period)
+    st.download_button(
+        "Download this week (.json)", data=week_file(data_dir, period).read_bytes(),
+        file_name=f"{period}.json", mime="application/json", on_click="ignore",
+    )
     operators = load_operators(data_dir)
     lines = load_lines(data_dir)
 
