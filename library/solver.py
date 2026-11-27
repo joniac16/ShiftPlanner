@@ -4,6 +4,8 @@
 
 import networkx as nx
 
+from library.models import Assignment, WeekAllocation
+
 
 def find_matching(graph: nx.Graph, maximize_matches: bool = True) -> dict[str, str]:
     """Find the best matching of the graph. Returns a dict: slot id -> operator id.
@@ -25,3 +27,18 @@ def find_matching(graph: nx.Graph, maximize_matches: bool = True) -> dict[str, s
 
     slot_order = [node for node, side in graph.nodes(data="bipartite") if side == 1]
     return {slot: operator_of_slot[slot] for slot in slot_order if slot in operator_of_slot}
+
+
+def build_allocation(period: str, matching: dict[str, str], graph: nx.Graph) -> WeekAllocation:
+    """Turn a matching (slot id -> operator id) into the week's allocation.
+
+    Each pair becomes an Assignment with the slot's line, shift and role (taken
+    from the slot node's attributes in the graph). The role is the role of the
+    slot, not the operator's level: a specialist in a qualified slot is stored
+    as "qualified". Assignments follow the order of `matching`.
+    """
+    assignments = []
+    for slot_id, operator_id in matching.items():
+        slot = graph.nodes[slot_id]
+        assignments.append(Assignment(operator=operator_id, line=slot["line"], shift=slot["shift"], role=slot["role"]))
+    return WeekAllocation(period=period, assignments=assignments)

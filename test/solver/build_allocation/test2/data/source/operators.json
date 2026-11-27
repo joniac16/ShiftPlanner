@@ -1,0 +1,5 @@
+[
+  {"id": "OP1", "name": "Marie Curie", "lines": {"L1": "specialist"}},
+  {"id": "OP2", "name": "Isaac Newton", "lines": {"L1": "specialist"}},
+  {"id": "OP3", "name": "Ada Lovelace", "lines": {}}
+]
