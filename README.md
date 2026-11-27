@@ -6,9 +6,9 @@ Automatic allocation of factory staff to production lines and shifts, using [Goo
 
 ```
 library/        Project functions (models, JSON loading, solver)
-tests/          Unit tests (pytest); fixtures/ holds test JSON files
-data/source/    Master data: lines.json, operators.json
-  weeks/<period>/  Weekly data: demand.json, availability.json
+tests/          Unit tests (pytest): unit_testing/<function>/ with test file and data
+data/source/    lines.json, operators.json (master data);
+                demands.json, availabilities.json (weekly data, keyed by ISO week)
 data/output/    Allocation proposals, one JSON per week
 data/history/   Approved allocations, one JSON per week
 main.py         Entry point
