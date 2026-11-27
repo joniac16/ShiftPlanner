@@ -7,9 +7,13 @@ Automatic allocation of factory staff to production lines and shifts, using [Goo
 ```
 library/        Project functions (models, JSON loading, solver)
 test/           Unit tests (pytest): <module>/<function>/ with test file and dummy data
-data/source/    lines.json, operators.json (master data);
+sample_data/    Sample (simulated) data:
+  source/       lines.json, operators.json (master data);
                 demands.json, availabilities.json (weekly data, keyed by ISO week)
-data/history/   Planned weeks, one JSON per week (written by the solver, read back for later weeks)
+  history/      Planned weeks, one JSON per week (written by the solver, read back for later weeks)
+data/           Working copy, empty in the repository and ignored by git. The first time
+                main.py or app.py runs, sample_data/ is copied into it; all planning
+                happens there. Delete its contents to start again from the samples.
 main.py         Command line entry point (plan_weeks)
 app.py          Web front end (Streamlit)
 ```

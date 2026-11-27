@@ -31,7 +31,7 @@ from library.loader import DataError, load_demands, load_history, load_lines, lo
 from library.models import MatchWeights
 from library.planner import plan_weeks
 from library.solver import find_matching
-from library.utils import iso_week_to_date, sort_iso_weeks
+from library.utils import ensure_data_dir, iso_week_to_date, sort_iso_weeks
 
 SHIFT_ORDER = ["Morning", "Afternoon", "Night"]
 ROLE_ORDER = ["specialist", "qualified", "assistant"]
@@ -332,9 +332,8 @@ def main() -> None:
     st.sidebar.title("ShiftPlanner")
     screen = st.sidebar.radio("Screen", list(SCREENS))
     data_dir = Path(st.sidebar.text_input("Data folder", value="data"))
-    if not (data_dir / "source").exists():
-        st.error(f"Data folder not found: {data_dir / 'source'}")
-        return
+    if ensure_data_dir(data_dir):
+        st.sidebar.info(f"{data_dir}/ had no data: the sample data was copied into it.")
     SCREENS[screen](data_dir)
 
 

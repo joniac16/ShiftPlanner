@@ -13,6 +13,7 @@ import sys
 from library.loader import DataError
 from library.models import MatchWeights
 from library.planner import plan_weeks
+from library.utils import ensure_data_dir
 
 
 def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
@@ -22,7 +23,9 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--start-week", type=int, required=True, help="ISO week number of the first week")
     parser.add_argument("--end-year", type=int, required=True, help="year of the last week to plan")
     parser.add_argument("--end-week", type=int, required=True, help="ISO week number of the last week")
-    parser.add_argument("--data-dir", default="data", help="data folder with source/ and history/ (default: data)")
+    parser.add_argument("--data-dir", default="data",
+                        help="working data folder with source/ and history/ (default: data); "
+                             "if it has no data, the sample data is copied into it")
     parser.add_argument("--maximize", choices=["matches", "weight"], default="matches",
                         help="matches: cover as many slots as possible, then highest weight (default); "
                              "weight: highest weight only")
@@ -38,6 +41,9 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_arguments(argv)
     weights = MatchWeights(**{name: getattr(args, name) for name in MatchWeights().__dict__})
+
+    if ensure_data_dir(args.data_dir):
+        print(f"{args.data_dir}/ had no data: copied the sample data from sample_data/.")
 
     try:
         results = plan_weeks(

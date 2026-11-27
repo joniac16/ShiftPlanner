@@ -1,0 +1,4 @@
+# Working data folder: created from sample_data/ the first time main.py or
+# app.py runs. Everything in it stays local and is never committed.
+*
+!.gitignore

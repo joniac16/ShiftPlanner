@@ -22,7 +22,7 @@ library/
                 weekly: LineDemand, Shift, Staff, Availability;
                 allocations: Assignment, WeekAllocation; solver input: PlanningInput;
                 graph: MatchWeights; solver output: PlanningResult)
-  utils.py      Small helpers: make_iso_week, next_iso_week, iso_week_to_date, sort_iso_weeks
+  utils.py      Small helpers: ensure_data_dir, make_iso_week, next_iso_week, iso_week_to_date, sort_iso_weeks
   loader.py     Reads the JSON files into models (see "Loader" below)
   graph.py      Builds the bipartite graph from the PlanningInput (see "Solver" below)
   solver.py     Matching with NetworkX (see "Solver" below)
@@ -31,7 +31,11 @@ library/
 test/
   loader/<function>/testX/        test_X_<function>.py + data/ (dummy data)
   graph/, solver/, writer/, planner/ <function>/testX/   same layout
-data/
+sample_data/                      Sample (simulated) data, committed: source/ + history W1-W4. Never modified by the app
+data/                             Working folder: in the repository it is EMPTY (only a .gitignore that ignores
+                                  everything in it). main.py / app.py copy sample_data/ into it the first time
+                                  (ensure_data_dir), and all planning happens there, so nothing is ever committed.
+                                  To start again from the samples, delete its contents.
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
     demands.json                  Weekly data: line needs, keyed by period
@@ -138,7 +142,7 @@ Exit code 0 and a summary per week (assignments, uncovered slots, unassigned ope
 
 ## Front end (`app.py`)
 
-Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar: screen and data folder (default `data`).
+Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar: screen and data folder (default `data`; if it has no data, the sample data is copied into it).
 
 | Screen | Shows |
 |---|---|
@@ -190,13 +194,14 @@ key and edit what changes.
 - Periods are ISO weeks as strings `YYYY-W<n>` with no leading zero (`2027-W5`, `2027-W12`). They do **not** sort chronologically as text, so always sort with `sort_iso_weeks` (`library/utils.py`). Never do integer arithmetic on them; convert with `iso_week_to_date` (some years have 53 ISO weeks, e.g. 2026).
 - Only ids are stored; names and training come from `operators.json`.
 
-## Sample data
+## Sample data (`sample_data/`)
 
+- The sample data lives in `sample_data/` (committed). The working folder `data/` is empty in the repository and ignored by git; `ensure_data_dir` (utils.py) copies `sample_data/` into it when it has no `source/`. Changes to the sample data itself must be made in `sample_data/`.
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
 - Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
 - Sample data must stay **feasible**: whenever master data, weekly data or rules change, check (e.g. with a quick matching or OR-Tools script) that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
-- When planning the next week, the solver must take the latest weeks in `data/history/` into account for restricted groups (e.g. an operator with two consecutive weeks in RG1 must rest).
+- When planning the next week, the solver must take the latest weeks in the history into account for restricted groups (e.g. an operator with two consecutive weeks in RG1 must rest).
 
 ## Ideas discussed, not implemented
 
