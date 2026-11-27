@@ -1,0 +1,16 @@
+{
+  "2027-W1": [
+    {"line": "L1", "shifts": [
+      {"name": "Morning", "staff": {"specialist": 1, "qualified": 1, "assistant": 0}}
+    ]}
+  ],
+  "2027-W2": [
+    {"line": "L1", "shifts": [
+      {"name": "Morning", "staff": {"specialist": 1, "qualified": 2, "assistant": 1}},
+      {"name": "Night",   "staff": {"specialist": 1, "qualified": 1, "assistant": 0}}
+    ]},
+    {"line": "L2", "shifts": [
+      {"name": "Afternoon", "staff": {"specialist": 0, "qualified": 1, "assistant": 2}}
+    ]}
+  ]
+}

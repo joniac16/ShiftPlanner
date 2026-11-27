@@ -1,0 +1,7 @@
+{
+  "period": "2027-W2",
+  "assignments": [
+    {"operator": "OP1", "line": "L1", "shift": "Night", "role": "specialist"},
+    {"operator": "OP3", "line": "L1", "shift": "Night", "role": "assistant"}
+  ]
+}
