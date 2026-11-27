@@ -22,7 +22,9 @@ class Shift:
 class Operator:
     id: str
     name: str
-    enabled_lines: list[str] = field(default_factory=list)
+    shifts: list[str] = field(default_factory=list)  # shift names the operator can cover
+    lines: dict[str, str] = field(default_factory=dict)  # line id -> "specialist" | "qualified"
+    # Lines not listed in `lines` can only be covered as "assistant".
 
 
 @dataclass
