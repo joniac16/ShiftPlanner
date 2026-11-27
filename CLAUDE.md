@@ -96,12 +96,15 @@ Each function has its tests in `test/graph/<function>/testX/`.
 |---|---|
 | `find_matching(graph, maximize_matches=True)` | dict slot id -> operator id (order of the slots in the graph), from `networkx.max_weight_matching(graph, maxcardinality=maximize_matches)` |
 | `build_allocation(period, matching, graph)` | `WeekAllocation`: one `Assignment` per pair, with the slot's line, shift and **role** (taken from the slot node); order of the matching |
+| `solve(data, weights=None, maximize_matches=True)` | `PlanningResult`: builds the graph, finds the matching, builds the allocation and the report. Always returns a plan; writes nothing to disk |
 
 `PlanningResult` (models.py), the output of `solve`: `allocation` (WeekAllocation, the week's plan), `uncovered_slots` (slot id -> number of candidate operators it had), `unassigned_operators` (available operators who got no slot), `total_weight`.
 
-Planned next: `solve(data, weights=None, maximize_matches=True)` -> PlanningResult. The uncovered-slots report starts simple (number of candidates); a Hall's theorem explanation is a possible later improvement.
+In `uncovered_slots`, 0 candidates means nobody could take the slot; more than 0 means its candidates were needed elsewhere. A Hall's theorem explanation is a possible later improvement.
 
-Simulated week 2027-W5: 48 of 48 slots covered, all with the exact level (total weight 480, a few ms).
+Planned next: `save_week` in `loader.py` (validate the plan and write it to `data/history/<period>.json`).
+
+Simulated week 2027-W5 with `solve`: 48 of 48 slots covered, all with the exact level (total weight 480, a few ms); 15 of the 63 available operators left unassigned.
 
 ## Workflow (planned)
 
