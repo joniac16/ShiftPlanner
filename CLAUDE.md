@@ -200,7 +200,7 @@ key and edit what changes.
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
 - Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
-- Sample data must stay **feasible**: whenever master data, weekly data or rules change, check (e.g. with a quick matching or OR-Tools script) that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
+- Sample data must stay **feasible**: whenever master data, weekly data or rules change, check (e.g. with a quick matching script) that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
 - When planning the next week, the solver must take the latest weeks in the history into account for restricted groups (e.g. an operator with two consecutive weeks in RG1 must rest).
 
 ## Ideas discussed, not implemented

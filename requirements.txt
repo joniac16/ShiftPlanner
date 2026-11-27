@@ -1,5 +1,4 @@
 matplotlib
 networkx
-ortools
 pytest
 streamlit
