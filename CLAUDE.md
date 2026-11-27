@@ -227,12 +227,12 @@ key and edit what changes.
 ## Data (`data/`) and backups
 
 - `data/` holds the real data (`source/` + `history/`); today its content is simulated. It is committed. Planning with `main.py` or `app.py` writes new history files there; do not commit them unless the user asks. Locally, `git clean -f data/history` removes the planned weeks that are not in git (back to the starting point); an online app is reset from the Streamlit Cloud panel (Reboot, or delete and redeploy).
-- `data/backup/1`, `2` and `3` each hold a copy of `data/source/` and `data/history/`, **to play and test with** (use one as the data folder, e.g. `data/backup/1`) without touching `data/`. To reset a backup folder, copy `source/` and `history/` back from `data/` or another untouched folder (or from git). If `data/` changes on purpose, refresh the backups if needed.
+- `data/backup/1`, `2` and `3` each hold a copy of `data/source/` and `data/history/` (taken before L6 and the W5 uncovered slots were added), **to play and test with** (use one as the data folder, e.g. `data/backup/1`) without touching `data/`. To reset a backup folder, copy `source/` and `history/` back from `data/` or another untouched folder (or from git). If `data/` changes on purpose, refresh the backups if needed.
 
 Current content (simulated):
-- 5 lines, 65 operators. L3 and L5 form restricted group RG1.
+- 6 lines, 65 operators. L3 and L5 form restricted group RG1. L6 has no trained operator (added on purpose, see W5).
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
-- Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). Today all their slots can be covered when planned in sequence after the history.
+- Weeks to plan: 2027-W5 to 2027-W8 (two absences in all of them: OP8, OP27). W6 to W8 are identical (48 positions, all coverable). **W5 has two slots that cannot be covered, on purpose** (user request, to show both kinds of uncovered slot): L6 Morning needs 1 specialist and nobody is trained on L6 (`L6-Morning-specialist-1`, 0 candidates); L1 Night needs 4 specialists but only 2 specialists + 4 qualified of L1 are available at night, so one stays uncovered with candidates needed elsewhere (`L1-Night-specialist-1`, 6 candidates). W5: 51 positions, 50 covered, total weight 478.
 - The data does **not** have to be fully coverable (user decision): a week may ask for slots nobody can take; the solver always returns a plan and reports the uncovered slots. What must hold is that the **history follows the rules** (availability, roles, one assignment per operator per week, restricted groups, no more operators than the demand), which `save_week` enforces through `validate_week`. Restricted groups need a wide enough trained pool to rotate, or their slots will often stay uncovered.
 - When planning the next week, the solver must take the latest weeks in the history into account for restricted groups (e.g. an operator with two consecutive weeks in RG1 must rest).
 
