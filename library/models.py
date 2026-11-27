@@ -120,19 +120,21 @@ class PlanningInput:
 
 @dataclass
 class MatchWeights:
-    """Weight of an edge (operator -> slot), by the operator's level on the line
-    and the role of the slot. Higher means preferred.
+    """Weight of an edge (operator -> slot): which slot is filled, and by whom.
+    Higher means preferred.
 
     The matching first covers as many slots as possible; the weights only decide
-    among the matchings that cover the same number of slots. Change them to
-    experiment, e.g. MatchWeights(qualified_as_specialist=0.5).
+    among the matchings that cover the same number of slots (who takes each
+    slot, and which slots stay empty when operators are missing). Change them
+    to experiment, e.g. MatchWeights(specialist_slot_qualified=0.5).
     """
 
-    exact: float = 10  # same level as the slot (untrained operator as assistant included)
-    specialist_as_qualified: float = 6
-    qualified_as_assistant: float = 3  # waste of training
-    specialist_as_assistant: float = 2  # waste of training
-    qualified_as_specialist: float = 1  # last resort
+    specialist_slot_specialist: float = 10  # specialist slot filled by a specialist
+    specialist_slot_qualified: float = 1  # specialist slot filled by a qualified operator (last resort)
+    qualified_slot_qualified: float = 10  # qualified slot filled by a qualified operator
+    qualified_slot_specialist: float = 6  # qualified slot filled by a specialist
+    assistant_slot_untrained: float = 10  # assistant slot filled by an operator with no training on the line
+    assistant_slot_trained: float = 3  # assistant slot filled by a trained operator (waste of training)
 
 
 # --- Solver output -------------------------------------------------------------

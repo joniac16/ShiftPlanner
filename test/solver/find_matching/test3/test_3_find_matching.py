@@ -1,10 +1,10 @@
 """Unit test 3 for library.solver.find_matching: maximize_matches=False takes the highest weight.
 
 Same dummy data as test2:
-  OP1 -> Morning specialist (10) or Night assistant (2)
+  OP1 -> Morning specialist (10) or Night assistant (3)
   OP2 -> Morning specialist (1)
 Without maximizing the number of matches, OP1 as specialist (weight 10) beats
-covering both slots (weight 3), so the Night assistant slot stays uncovered.
+covering both slots (weight 4), so the Night assistant slot stays uncovered.
 """
 
 from pathlib import Path

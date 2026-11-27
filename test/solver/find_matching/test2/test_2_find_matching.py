@@ -2,10 +2,10 @@
 
 Dummy data: L1 needs 1 specialist in the morning and 1 assistant at night.
   OP1 specialist on L1, available morning and night
-      -> Morning specialist (weight 10) or Night assistant (weight 2)
+      -> Morning specialist (weight 10) or Night assistant (weight 3)
   OP2 qualified on L1, available only in the morning
       -> Morning specialist as last resort (weight 1)
-Covering both slots (OP2 as specialist + OP1 as assistant, weight 3) beats
+Covering both slots (OP2 as specialist + OP1 as assistant, weight 4) beats
 covering only one with more weight (OP1 as specialist, weight 10).
 """
 

@@ -91,7 +91,18 @@ Approach: bipartite graph, maximum-cardinality matching with maximum total weigh
   | no training on that line | assistant only |
 
   Any operator can be an assistant on any running line, but it wastes training, so it should only happen when operators are left over.
-- **Weights** are parameters, easy to change to experiment: `MatchWeights` in `models.py` (defaults: exact 10, specialist as qualified 6, qualified as assistant 3, specialist as assistant 2, qualified as specialist 1; an untrained operator as assistant counts as exact). Usage: `build_edges(data, operator_set, slot_set, MatchWeights(qualified_as_specialist=0.5))`. Weights only decide among matchings that cover the same number of slots.
+- **Weights** are parameters, easy to change to experiment: `MatchWeights` in `models.py`. One weight per (slot role, who fills it) (user decision, replacing the earlier "exact level" weights):
+
+  | Field | Slot filled | Default |
+  |---|---|---|
+  | `specialist_slot_specialist` | specialist slot by a specialist | 10 |
+  | `specialist_slot_qualified` | specialist slot by a qualified operator (last resort) | 1 |
+  | `qualified_slot_qualified` | qualified slot by a qualified operator | 10 |
+  | `qualified_slot_specialist` | qualified slot by a specialist | 6 |
+  | `assistant_slot_untrained` | assistant slot by an operator untrained on the line | 10 |
+  | `assistant_slot_trained` | assistant slot by a specialist or qualified operator (waste of training) | 3 |
+
+  Usage: `build_edges(data, operator_set, slot_set, MatchWeights(specialist_slot_qualified=0.5))`. Weights only decide among matchings that cover the same number of slots: who takes each slot and, when operators are missing, which slots stay empty.
 - **Restricted groups block every role**: an operator who must rest from a group cannot go to any of its lines, not even as an assistant. Rule (`get_blocked_groups`): blocked if the last run of consecutive weeks in the group lasted at least `max_consecutive_weeks` and fewer than `min_rest_weeks` weeks have passed since it ended. A week with no history counts as not worked.
 - The history stores the **role of the slot** taken, not the operator's level.
 - New models (slots, weights) go in `models.py`.
@@ -147,8 +158,9 @@ Command line (`main.py` only parses arguments and calls `plan_weeks`; it has no 
 
     python main.py --start-year 2027 --start-week 5 --end-year 2027 --end-week 8
         [--data-dir data] [--maximize matches|weight] [--overwrite]
-        [--exact 10] [--specialist-as-qualified 6] [--qualified-as-assistant 3]
-        [--specialist-as-assistant 2] [--qualified-as-specialist 1]
+        [--specialist-slot-specialist 10] [--specialist-slot-qualified 1]
+        [--qualified-slot-qualified 10] [--qualified-slot-specialist 6]
+        [--assistant-slot-untrained 10] [--assistant-slot-trained 3]
 
 Exit code 0 and a summary per week (assignments, uncovered slots, unassigned operators, total weight); on DataError, the message and exit code 1.
 
@@ -158,7 +170,7 @@ Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only disp
 
 | Screen | Shows |
 |---|---|
-| Plan | form with start/end year and week (default: the source weeks not in the history yet), objective, overwrite and the five weights; calls `plan_weeks` and shows, per week, assignments, uncovered slots (with candidates), unassigned operators and total weight. Errors and `save_week` warnings are shown in the page |
+| Plan | form with start/end year and week (default: the source weeks not in the history yet), objective, overwrite and the six weights; calls `plan_weeks` and shows, per week, assignments, uncovered slots (with candidates), unassigned operators and total weight. Errors and `save_week` warnings are shown in the page |
 | Schedule | a history week as a lines x shifts table with names and roles, coverage against that week's demand (covered / needed), and all assignments with each operator's level on the line |
 | Data | operators with their level per line, lines with their restricted group, and a week's demand and availability |
 | Graph | the bipartite graph of a week limited to the chosen lines and shifts (operators left, slots right), drawn with matplotlib, with the matching's edges in red; for the thesis. Its matching only uses the chosen lines/shifts, so it can differ from the full week's plan |

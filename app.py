@@ -36,11 +36,12 @@ from library.utils import iso_week_to_date, sort_iso_weeks
 SHIFT_ORDER = ["Morning", "Afternoon", "Night"]
 ROLE_ORDER = ["specialist", "qualified", "assistant"]
 WEIGHT_LABELS = {
-    "exact": "Exact level (incl. untrained as assistant)",
-    "specialist_as_qualified": "Specialist as qualified",
-    "qualified_as_assistant": "Qualified as assistant",
-    "specialist_as_assistant": "Specialist as assistant",
-    "qualified_as_specialist": "Qualified as specialist (last resort)",
+    "specialist_slot_specialist": "Specialist slot filled by a specialist",
+    "specialist_slot_qualified": "Specialist slot filled by a qualified operator (last resort)",
+    "qualified_slot_qualified": "Qualified slot filled by a qualified operator",
+    "qualified_slot_specialist": "Qualified slot filled by a specialist",
+    "assistant_slot_untrained": "Assistant slot filled by an untrained operator",
+    "assistant_slot_trained": "Assistant slot filled by a trained operator (waste of training)",
 }
 
 

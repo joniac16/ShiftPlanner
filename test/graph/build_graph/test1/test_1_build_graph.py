@@ -28,7 +28,7 @@ EXPECTED_SLOTS = {
 EXPECTED_EDGES = {
     ('OP1', 'L1-Morning-specialist-1'): 10,
     ('OP1', 'L1-Morning-qualified-1'): 6,
-    ('OP1', 'L1-Morning-assistant-1'): 2,
+    ('OP1', 'L1-Morning-assistant-1'): 3,
     ('OP2', 'L1-Morning-specialist-1'): 1,
     ('OP2', 'L1-Morning-qualified-1'): 10,
     ('OP2', 'L1-Morning-assistant-1'): 3,

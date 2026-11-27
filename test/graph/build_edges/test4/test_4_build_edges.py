@@ -13,21 +13,22 @@ from library.models import MatchWeights
 DATA_DIR = Path(__file__).parent / "data"
 
 WEIGHTS = MatchWeights(
-    exact=5,
-    specialist_as_qualified=4,
-    qualified_as_assistant=0.5,
-    specialist_as_assistant=0.25,
-    qualified_as_specialist=0.1,
+    specialist_slot_specialist=5,
+    specialist_slot_qualified=0.1,
+    qualified_slot_qualified=4.5,
+    qualified_slot_specialist=4,
+    assistant_slot_untrained=2,
+    assistant_slot_trained=0.5,
 )
 
 EXPECTED = [
     ('OP1', 'L1-Morning-specialist-1', 5),
     ('OP1', 'L1-Morning-qualified-1', 4),
-    ('OP1', 'L1-Morning-assistant-1', 0.25),
+    ('OP1', 'L1-Morning-assistant-1', 0.5),
     ('OP2', 'L1-Morning-specialist-1', 0.1),
-    ('OP2', 'L1-Morning-qualified-1', 5),
+    ('OP2', 'L1-Morning-qualified-1', 4.5),
     ('OP2', 'L1-Morning-assistant-1', 0.5),
-    ('OP3', 'L1-Morning-assistant-1', 5),
+    ('OP3', 'L1-Morning-assistant-1', 2),
 ]
 
 

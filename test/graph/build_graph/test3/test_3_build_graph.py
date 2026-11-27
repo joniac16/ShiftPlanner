@@ -1,7 +1,7 @@
 """Unit test 3 for library.graph.build_graph: custom weights reach the edges.
 
-Same dummy data as test1, built with MatchWeights(specialist_as_qualified=7,
-qualified_as_specialist=0.5): only those two edges change.
+Same dummy data as test1, built with MatchWeights(qualified_slot_specialist=7,
+specialist_slot_qualified=0.5): only those two edges change.
 """
 
 from pathlib import Path
@@ -12,7 +12,7 @@ from library.models import MatchWeights
 
 DATA_DIR = Path(__file__).parent / "data"
 
-WEIGHTS = MatchWeights(specialist_as_qualified=7, qualified_as_specialist=0.5)
+WEIGHTS = MatchWeights(qualified_slot_specialist=7, specialist_slot_qualified=0.5)
 
 EXPECTED_OPERATORS = {
     'OP1': {'shifts': ['Morning'], 'lines': {'L1': ['specialist', 'qualified', 'assistant']}, 'bipartite': 0},
@@ -29,7 +29,7 @@ EXPECTED_SLOTS = {
 EXPECTED_EDGES = {
     ('OP1', 'L1-Morning-specialist-1'): 10,
     ('OP1', 'L1-Morning-qualified-1'): 7,
-    ('OP1', 'L1-Morning-assistant-1'): 2,
+    ('OP1', 'L1-Morning-assistant-1'): 3,
     ('OP2', 'L1-Morning-specialist-1'): 0.5,
     ('OP2', 'L1-Morning-qualified-1'): 10,
     ('OP2', 'L1-Morning-assistant-1'): 3,

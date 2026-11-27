@@ -1,10 +1,14 @@
-"""Unit test 1 for library.graph.build_edges: the 7 level -> slot role combinations, default weights.
+"""Unit test 1 for library.graph.build_edges: every weight field, default weights.
 
     Dummy data: L1 Morning needs 1 specialist, 1 qualified and 1 assistant.
     All operators are available in the morning:
-      OP1  specialist on L1 -> specialist 10 (exact), qualified 6, assistant 2
-      OP2  qualified on L1  -> specialist 1 (last resort), qualified 10 (exact), assistant 3
-      OP3  no training      -> assistant 10 (exact)
+      OP1  specialist on L1 -> specialist slot 10 (specialist_slot_specialist),
+                               qualified slot 6 (qualified_slot_specialist),
+                               assistant slot 3 (assistant_slot_trained)
+      OP2  qualified on L1  -> specialist slot 1 (specialist_slot_qualified, last resort),
+                               qualified slot 10 (qualified_slot_qualified),
+                               assistant slot 3 (assistant_slot_trained)
+      OP3  no training      -> assistant slot 10 (assistant_slot_untrained)
 """
 
 from pathlib import Path
@@ -17,7 +21,7 @@ DATA_DIR = Path(__file__).parent / "data"
 EXPECTED = [
     ('OP1', 'L1-Morning-specialist-1', 10),
     ('OP1', 'L1-Morning-qualified-1', 6),
-    ('OP1', 'L1-Morning-assistant-1', 2),
+    ('OP1', 'L1-Morning-assistant-1', 3),
     ('OP2', 'L1-Morning-specialist-1', 1),
     ('OP2', 'L1-Morning-qualified-1', 10),
     ('OP2', 'L1-Morning-assistant-1', 3),

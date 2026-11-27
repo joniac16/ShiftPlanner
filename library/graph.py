@@ -193,16 +193,16 @@ def build_edges(
     There is an edge between an operator and a slot when the slot's shift is in
     the operator's shifts, the slot's line is in the operator's lines (so it is
     running and not blocked) and the slot's role is one of the roles the
-    operator can take on that line. Its weight depends on the operator's level
-    on the line (their training in `data.operators`; None if untrained) and the
-    slot's role:
+    operator can take on that line. Its weight depends on the slot's role and
+    on who fills it (the operator's level on the line, from `data.operators`):
 
-        level -> slot role              weight field
-        same level, or None -> assistant  exact
-        specialist -> qualified           specialist_as_qualified
-        qualified  -> assistant           qualified_as_assistant
-        specialist -> assistant           specialist_as_assistant
-        qualified  -> specialist          qualified_as_specialist
+        slot role    filled by                    weight field
+        specialist   specialist                   specialist_slot_specialist
+        specialist   qualified (last resort)      specialist_slot_qualified
+        qualified    qualified                    qualified_slot_qualified
+        qualified    specialist                   qualified_slot_specialist
+        assistant    no training on the line      assistant_slot_untrained
+        assistant    specialist or qualified      assistant_slot_trained
 
     Result: list of (operator id, slot id, weight), ready for
     `G.add_weighted_edges_from`. Order: operators as in `operator_set`, slots as
@@ -211,14 +211,15 @@ def build_edges(
     if weights is None:
         weights = MatchWeights()
 
+    # (operator level on the line, slot role) -> weight
     weight_by_level_and_role = {
-        ("specialist", "specialist"): weights.exact,
-        ("qualified", "qualified"): weights.exact,
-        (None, "assistant"): weights.exact,
-        ("specialist", "qualified"): weights.specialist_as_qualified,
-        ("qualified", "assistant"): weights.qualified_as_assistant,
-        ("specialist", "assistant"): weights.specialist_as_assistant,
-        ("qualified", "specialist"): weights.qualified_as_specialist,
+        ("specialist", "specialist"): weights.specialist_slot_specialist,
+        ("qualified", "specialist"): weights.specialist_slot_qualified,
+        ("qualified", "qualified"): weights.qualified_slot_qualified,
+        ("specialist", "qualified"): weights.qualified_slot_specialist,
+        (None, "assistant"): weights.assistant_slot_untrained,
+        ("specialist", "assistant"): weights.assistant_slot_trained,
+        ("qualified", "assistant"): weights.assistant_slot_trained,
     }
 
     edges: list[tuple[str, str, float]] = []
