@@ -8,7 +8,7 @@ class Staff:
     """Number of operators of each type required in a shift."""
 
     specialist: int = 0
-    trained: int = 0
+    qualified: int = 0
     assistant: int = 0
 
 
