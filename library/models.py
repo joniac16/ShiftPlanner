@@ -5,6 +5,7 @@ Weekly data (data/source/demands.json, availabilities.json): LineDemand, Shift,
 Staff, Availability.
 Allocations (data/output, data/history): Assignment, WeekAllocation.
 Solver input: PlanningInput.
+Graph: MatchWeights.
 """
 
 from dataclasses import dataclass, field
@@ -111,3 +112,23 @@ class PlanningInput:
     demands: list[LineDemand]  # lines running this week and their needs
     availabilities: dict[str, Availability]  # operator id -> Availability (missing: not available)
     history: list[WeekAllocation]  # approved weeks before `period`, oldest first
+
+
+# --- Graph ---------------------------------------------------------------------
+
+
+@dataclass
+class MatchWeights:
+    """Weight of an edge (operator -> slot), by the operator's level on the line
+    and the role of the slot. Higher means preferred.
+
+    The matching first covers as many slots as possible; the weights only decide
+    among the matchings that cover the same number of slots. Change them to
+    experiment, e.g. MatchWeights(qualified_as_specialist=0.5).
+    """
+
+    exact: float = 10  # same level as the slot (untrained operator as assistant included)
+    specialist_as_qualified: float = 6
+    qualified_as_assistant: float = 3  # waste of training
+    specialist_as_assistant: float = 2  # waste of training
+    qualified_as_specialist: float = 1  # last resort

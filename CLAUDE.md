@@ -19,7 +19,8 @@ Automatic allocation of factory operators to production lines and shifts, modell
 library/
   models.py     Dataclasses (master: Line, RestrictedGroup, Operator;
                 weekly: LineDemand, Shift, Staff, Availability;
-                allocations: Assignment, WeekAllocation; solver input: PlanningInput)
+                allocations: Assignment, WeekAllocation; solver input: PlanningInput;
+                graph: MatchWeights)
   utils.py      Small helpers: iso_week_to_date, sort_iso_weeks
   loader.py     Reads the JSON files into models (see "Loader" below)
   graph.py      Builds the bipartite graph from the PlanningInput (see "Solver" below)
@@ -69,7 +70,7 @@ Approach: bipartite graph, maximum-cardinality matching with maximum total weigh
   | no training on that line | assistant only |
 
   Any operator can be an assistant on any running line, but it wastes training, so it should only happen when operators are left over.
-- **Weights** are parameters, easy to change to experiment (proposed defaults: exact 10, specialist as qualified 6, qualified as assistant 3, specialist as assistant 2, qualified as specialist 1). Weights only decide among matchings that cover the same number of slots.
+- **Weights** are parameters, easy to change to experiment: `MatchWeights` in `models.py` (defaults: exact 10, specialist as qualified 6, qualified as assistant 3, specialist as assistant 2, qualified as specialist 1; an untrained operator as assistant counts as exact). Usage: `build_edges(data, operator_set, slot_set, MatchWeights(qualified_as_specialist=0.5))`. Weights only decide among matchings that cover the same number of slots.
 - **Restricted groups block every role**: an operator who must rest from a group cannot go to any of its lines, not even as an assistant. Rule (`get_blocked_groups`): blocked if the last run of consecutive weeks in the group lasted at least `max_consecutive_weeks` and fewer than `min_rest_weeks` weeks have passed since it ended. A week with no history counts as not worked.
 - The history stores the **role of the slot** taken, not the operator's level.
 - New models (slots, weights) go in `models.py`.
@@ -81,12 +82,13 @@ Approach: bipartite graph, maximum-cardinality matching with maximum total weigh
 | `get_blocked_groups(data)` | operator id -> set of restricted group ids they are blocked from that week |
 | `build_operator_set(data)` | operator id -> `{"shifts": [...], "lines": {line id: [roles]}}`: available operators, every running line they can go to with **all the slot roles** they can take there (following the assignment rules, `ALLOWED_ROLES`), blocked lines removed; operators with no shifts or no possible line left out |
 | `build_slot_set(data)` | slot id -> `{"line", "shift", "role"}`: one slot (graph node) per position needed in the week's demands, ids like `L1-Morning-qualified-2` (numbered from 1); roles with 0 positions give no slot; order of the demands, then specialist, qualified, assistant |
+| `build_edges(data, operator_set, slot_set, weights=None)` | list of `(operator id, slot id, weight)`, ready for `G.add_weighted_edges_from`: an edge when the slot's shift is in the operator's shifts, its line in the operator's lines and its role among the operator's roles there; weight by operator level (from `data.operators`) and slot role, using `MatchWeights` (defaults if None) |
 
 Both sets are plain dicts (id -> attributes), ready for `G.add_nodes_from(set.items(), bipartite=0/1)`; no extra model is needed. Operator and slot ids never clash (`OP1` vs `L1-...`).
 
 Each function has its tests in `test/graph/<function>/testX/`.
 
-Planned next: the edges with weights and the graph.
+Planned next: the graph (NetworkX) and the matching.
 
 ## Workflow (planned, implemented with the solver)
 

@@ -37,7 +37,7 @@ the group.
 
 from datetime import date, timedelta
 
-from library.models import PlanningInput
+from library.models import MatchWeights, PlanningInput
 from library.utils import iso_week_to_date
 
 ONE_WEEK = timedelta(weeks=1)
@@ -178,3 +178,57 @@ def build_slot_set(data: PlanningInput) -> dict[str, dict]:
                     slot_set[slot_id] = {"line": demand.line, "shift": shift.name, "role": role}
 
     return slot_set
+
+
+def build_edges(
+    data: PlanningInput,
+    operator_set: dict[str, dict],
+    slot_set: dict[str, dict],
+    weights: MatchWeights | None = None,
+) -> list[tuple[str, str, float]]:
+    """Build the weighted edges of the bipartite graph.
+
+    There is an edge between an operator and a slot when the slot's shift is in
+    the operator's shifts, the slot's line is in the operator's lines (so it is
+    running and not blocked) and the slot's role is one of the roles the
+    operator can take on that line. Its weight depends on the operator's level
+    on the line (their training in `data.operators`; None if untrained) and the
+    slot's role:
+
+        level -> slot role              weight field
+        same level, or None -> assistant  exact
+        specialist -> qualified           specialist_as_qualified
+        qualified  -> assistant           qualified_as_assistant
+        specialist -> assistant           specialist_as_assistant
+        qualified  -> specialist          qualified_as_specialist
+
+    Result: list of (operator id, slot id, weight), ready for
+    `G.add_weighted_edges_from`. Order: operators as in `operator_set`, slots as
+    in `slot_set`. `weights` defaults to `MatchWeights()`.
+    """
+    if weights is None:
+        weights = MatchWeights()
+
+    weight_by_level_and_role = {
+        ("specialist", "specialist"): weights.exact,
+        ("qualified", "qualified"): weights.exact,
+        (None, "assistant"): weights.exact,
+        ("specialist", "qualified"): weights.specialist_as_qualified,
+        ("qualified", "assistant"): weights.qualified_as_assistant,
+        ("specialist", "assistant"): weights.specialist_as_assistant,
+        ("qualified", "specialist"): weights.qualified_as_specialist,
+    }
+
+    edges: list[tuple[str, str, float]] = []
+
+    for operator_id, options in operator_set.items():
+        for slot_id, slot in slot_set.items():
+            if slot["shift"] not in options["shifts"]:
+                continue
+            roles = options["lines"].get(slot["line"])
+            if roles is None or slot["role"] not in roles:
+                continue
+            level = data.operators[operator_id].lines.get(slot["line"])
+            edges.append((operator_id, slot_id, weight_by_level_and_role[(level, slot["role"])]))
+
+    return edges
