@@ -31,11 +31,9 @@ library/
 test/
   loader/<function>/testX/        test_X_<function>.py + data/ (dummy data)
   graph/, solver/, writer/, planner/ <function>/testX/   same layout
-sample_data/                      Sample (simulated) data, committed: source/ + history W1-W4. Never modified by the app
-data/                             Working folder: in the repository it is EMPTY (only a .gitignore that ignores
-                                  everything in it). The user copies sample_data/ into it BY HAND (main.py and
-                                  app.py never copy anything; with no data/source they stop with an error).
-                                  All planning happens there, so nothing is ever committed.
+data/                             Simulated data, committed (source/ + history W1-W4). The app and main.py read
+                                  and write here: planning adds files to data/history/ (user decision: no
+                                  separate sample_data/ folder and no .gitignore in data/).
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
     demands.json                  Weekly data: line needs, keyed by period
@@ -194,9 +192,9 @@ key and edit what changes.
 - Periods are ISO weeks as strings `YYYY-W<n>` with no leading zero (`2027-W5`, `2027-W12`). They do **not** sort chronologically as text, so always sort with `sort_iso_weeks` (`library/utils.py`). Never do integer arithmetic on them; convert with `iso_week_to_date` (some years have 53 ISO weeks, e.g. 2026).
 - Only ids are stored; names and training come from `operators.json`.
 
-## Sample data (`sample_data/`)
+## Sample data (`data/`)
 
-- The sample data lives in `sample_data/` (committed). The working folder `data/` is empty in the repository and ignored by git; the user copies `sample_data/` into it by hand (user decision: no automatic copy). Changes to the sample data itself must be made in `sample_data/`.
+- The simulated data lives directly in `data/` and is committed. Planning with `main.py` or `app.py` writes new history files there; do not commit them unless the user asks.
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
 - Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
