@@ -1,30 +1,13 @@
-"""Data models: Operator, Line, Shift, Staff and RestrictedGroup."""
+"""Data models.
+
+Master data (data/source): Line, RestrictedGroup, Operator.
+Weekly data (data/source/weeks/<period>): LineDemand, Shift, Staff, Availability.
+"""
 
 from dataclasses import dataclass, field
 
 
-@dataclass
-class Staff:
-    """Number of operators of each type required in a shift."""
-
-    specialist: int = 0
-    qualified: int = 0
-    assistant: int = 0
-
-
-@dataclass
-class Shift:
-    name: str  # e.g. "Morning", "Afternoon", "Night", "Weekend"
-    staff: Staff = field(default_factory=Staff)
-
-
-@dataclass
-class Operator:
-    id: str
-    name: str
-    shifts: list[str] = field(default_factory=list)  # shift names the operator can cover
-    lines: dict[str, str] = field(default_factory=dict)  # line id -> "specialist" | "qualified"
-    # Lines not listed in `lines` can only be covered as "assistant".
+# --- Master data ---------------------------------------------------------
 
 
 @dataclass
@@ -46,5 +29,46 @@ class RestrictedGroup:
 class Line:
     id: str
     name: str
-    shifts: list[Shift] = field(default_factory=list)
     restricted_group: RestrictedGroup | None = None  # None: no restrictions
+
+
+@dataclass
+class Operator:
+    id: str
+    name: str
+    lines: dict[str, str] = field(default_factory=dict)  # line id -> "specialist" | "qualified"
+    # Lines not listed in `lines` can only be covered as "assistant".
+
+
+# --- Weekly data -----------------------------------------------------------
+
+
+@dataclass
+class Staff:
+    """Number of operators of each role required in a shift."""
+
+    specialist: int = 0
+    qualified: int = 0
+    assistant: int = 0
+
+
+@dataclass
+class Shift:
+    name: str  # e.g. "Morning", "Afternoon", "Night", "Weekend"
+    staff: Staff = field(default_factory=Staff)
+
+
+@dataclass
+class LineDemand:
+    """Shifts a line runs in a given week and the staff each one needs."""
+
+    line: str  # line id
+    shifts: list[Shift] = field(default_factory=list)
+
+
+@dataclass
+class Availability:
+    """Shifts an operator can cover in a given week (empty: not available)."""
+
+    operator: str  # operator id
+    shifts: list[str] = field(default_factory=list)

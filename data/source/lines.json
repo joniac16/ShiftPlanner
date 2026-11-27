@@ -1,48 +1,7 @@
 [
-  {
-    "id": "L1",
-    "name": "Line 1",
-    "shifts": [
-      {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
-      {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
-      {"name": "Night",     "staff": {"specialist": 1, "qualified": 2, "assistant": 0}},
-      {"name": "Weekend",   "staff": {"specialist": 1, "qualified": 2, "assistant": 0}}
-    ]
-  },
-  {
-    "id": "L2",
-    "name": "Line 2",
-    "shifts": [
-      {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
-      {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
-      {"name": "Night",     "staff": {"specialist": 1, "qualified": 2, "assistant": 0}},
-      {"name": "Weekend",   "staff": {"specialist": 1, "qualified": 2, "assistant": 0}}
-    ]
-  },
-  {
-    "id": "L3",
-    "name": "Line 3",
-    "restricted_group": {"id": "RG1", "max_consecutive_weeks": 2, "min_rest_weeks": 2},
-    "shifts": [
-      {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}},
-      {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 2, "assistant": 1}},
-      {"name": "Night",     "staff": {"specialist": 1, "qualified": 1, "assistant": 0}}
-    ]
-  },
-  {
-    "id": "L4",
-    "name": "Line 4",
-    "shifts": [
-      {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}},
-      {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 2, "assistant": 0}}
-    ]
-  },
-  {
-    "id": "L5",
-    "name": "Line 5",
-    "restricted_group": {"id": "RG1", "max_consecutive_weeks": 2, "min_rest_weeks": 2},
-    "shifts": [
-      {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
-    ]
-  }
+  {"id": "L1", "name": "Line 1"},
+  {"id": "L2", "name": "Line 2"},
+  {"id": "L3", "name": "Line 3", "restricted_group": {"id": "RG1", "max_consecutive_weeks": 2, "min_rest_weeks": 2}},
+  {"id": "L4", "name": "Line 4"},
+  {"id": "L5", "name": "Line 5", "restricted_group": {"id": "RG1", "max_consecutive_weeks": 2, "min_rest_weeks": 2}}
 ]
