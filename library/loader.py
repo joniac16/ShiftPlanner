@@ -16,12 +16,13 @@ from library.models import (
     Line,
     LineDemand,
     Operator,
+    PlanningInput,
     RestrictedGroup,
     Shift,
     Staff,
     WeekAllocation,
 )
-from library.utils import sort_iso_weeks
+from library.utils import iso_week_to_date, sort_iso_weeks
 
 DEFAULT_DATA_DIR = Path("data")
 
@@ -180,3 +181,43 @@ def load_history(data_dir: Path | str = DEFAULT_DATA_DIR) -> list[WeekAllocation
         history.append(WeekAllocation(period=period, assignments=assignments))
 
     return history
+
+
+def load_planning_input(period: str, data_dir: Path | str = DEFAULT_DATA_DIR) -> PlanningInput:
+    """Load everything the solver needs to plan one week.
+
+    Calls the five load functions above, keeps only the history weeks before
+    `period`, and checks that the files fit together. Raises DataError if:
+      - an operator is trained on a line that does not exist,
+      - the week's demand refers to a line that does not exist,
+      - the week's availability refers to an operator that does not exist.
+    """
+    lines = load_lines(data_dir)
+    operators = load_operators(data_dir)
+    demands = load_demands(period, data_dir)
+    availabilities = load_availabilities(period, data_dir)
+
+    start = iso_week_to_date(period)
+    history = [week for week in load_history(data_dir) if iso_week_to_date(week.period) < start]
+
+    for operator in operators.values():
+        for line_id in operator.lines:
+            if line_id not in lines:
+                raise DataError(f"Operator {operator.id} is trained on line {line_id}, which does not exist")
+
+    for demand in demands:
+        if demand.line not in lines:
+            raise DataError(f"Demand for {period} refers to line {demand.line}, which does not exist")
+
+    for operator_id in availabilities:
+        if operator_id not in operators:
+            raise DataError(f"Availability for {period} refers to operator {operator_id}, which does not exist")
+
+    return PlanningInput(
+        period=period,
+        lines=lines,
+        operators=operators,
+        demands=demands,
+        availabilities=availabilities,
+        history=history,
+    )
