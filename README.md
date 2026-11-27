@@ -1,6 +1,6 @@
 # ShiftPlanner
 
-Automatic allocation of factory staff to production lines and shifts, using [Google OR-Tools](https://developers.google.com/optimization).
+Automatic allocation of factory staff to production lines and shifts, modelled as a maximum-weight matching in a bipartite graph (operators and slots), solved with [NetworkX](https://networkx.org/).
 
 ## Structure
 
