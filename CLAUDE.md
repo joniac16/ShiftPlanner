@@ -142,7 +142,7 @@ Exit code 0 and a summary per week (assignments, uncovered slots, unassigned ope
 
 ## Front end (`app.py`)
 
-Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar: screen and data folder (default `data`; if it has no `source/`, an error asks to copy the sample data first).
+Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar: screen and data folder (default `data`; if it has no `source/`, it only shows an error saying there is no data).
 
 | Screen | Shows |
 |---|---|

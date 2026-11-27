@@ -333,8 +333,7 @@ def main() -> None:
     screen = st.sidebar.radio("Screen", list(SCREENS))
     data_dir = Path(st.sidebar.text_input("Data folder", value="data"))
     if not (data_dir / "source").exists():
-        st.error(f"No data in {data_dir / 'source'}. Copy the sample data first "
-                 f"(the contents of sample_data/ into {data_dir}/) or choose another data folder.")
+        st.error(f"No data in {data_dir / 'source'}.")
         return
     SCREENS[screen](data_dir)
 
