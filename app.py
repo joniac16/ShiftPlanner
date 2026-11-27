@@ -3,14 +3,12 @@
 Run it with:
     streamlit run app.py
 
-Four screens, chosen in the sidebar:
+Three screens, chosen in the sidebar:
   - Plan:     choose the range of weeks, the objective, overwrite and weights,
               run `plan_weeks` and see the report of every week.
   - Schedule: one week of the history as a table of lines x shifts.
   - Data:     operators and their training, lines, and each week's demand
               and availability.
-  - Graph:    the bipartite graph of a week (a few lines and shifts), with
-              the edges of the matching highlighted. For the thesis.
 
 The app only displays data and calls functions of `library/`; all the logic
 (and its tests) lives there.
@@ -19,18 +17,15 @@ The app only displays data and calls functions of `library/`; all the logic
 import contextlib
 import io
 import json
-from dataclasses import fields, replace
+from dataclasses import fields
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
-from library.graph import build_graph
 from library.loader import DataError, load_demands, load_history, load_lines, load_operators, load_planning_input
 from library.models import MatchWeights
 from library.planner import plan_weeks
-from library.solver import find_matching
 from library.utils import iso_week_to_date, sort_iso_weeks
 
 SHIFT_ORDER = ["Morning", "Afternoon", "Night"]
@@ -243,89 +238,9 @@ def data_screen(data_dir: Path) -> None:
         st.dataframe(pd.DataFrame(rows), hide_index=True)
 
 
-def graph_screen(data_dir: Path) -> None:
-    st.header("Bipartite graph")
-    st.write("The graph of one week, limited to a few lines and shifts so it can be read. "
-             "Operators on the left, slots on the right; the edges of the matching are highlighted.")
-
-    weeks = source_weeks(data_dir)
-    if not weeks:
-        st.info("No weekly data.")
-        return
-    period = st.selectbox("Week", weeks, key="graph-week")
-    data = load_planning_input(period, data_dir)
-
-    all_lines = [d.line for d in data.demands]
-    all_shifts = sorted({s.name for d in data.demands for s in d.shifts}, key=shift_sort_key)
-    c1, c2 = st.columns(2)
-    chosen_lines = c1.multiselect("Lines", all_lines, default=all_lines[:1])
-    chosen_shifts = c2.multiselect("Shifts", all_shifts, default=all_shifts[:1])
-    maximize = st.checkbox("Maximize the number of covered slots", value=True)
-    only_candidates = st.checkbox("Hide operators with no edge", value=True)
-    with st.expander("Edge weights"):
-        weights = weights_form("graph")
-
-    # Keep only the chosen lines and shifts.
-    demands = []
-    for d in data.demands:
-        if d.line in chosen_lines:
-            shifts = [s for s in d.shifts if s.name in chosen_shifts]
-            if shifts:
-                demands.append(replace(d, shifts=shifts))
-    if not demands:
-        st.info("Choose at least one line and one shift that run this week.")
-        return
-
-    graph = build_graph(replace(data, demands=demands), weights)
-    if only_candidates:
-        graph.remove_nodes_from([n for n, side in list(graph.nodes(data="bipartite")) if side == 0 and graph.degree(n) == 0])
-    matching = find_matching(graph, maximize)
-
-    operators = [n for n, side in graph.nodes(data="bipartite") if side == 0]
-    slots = [n for n, side in graph.nodes(data="bipartite") if side == 1]
-    # Both columns span the same height, so the slots are spread out even when
-    # there are many more operators than slots.
-    span = max(len(operators), len(slots)) - 1 or 1
-
-    def column(nodes, x):
-        step = span / (len(nodes) - 1) if len(nodes) > 1 else 0
-        start = 0 if len(nodes) > 1 else -span / 2
-        return {n: (x, start - i * step) for i, n in enumerate(nodes)}
-
-    position = {**column(operators, 0), **column(slots, 1)}
-    chosen = {frozenset(pair) for pair in matching.items()}
-
-    height = max(4, 0.35 * max(len(operators), len(slots)))
-    fig, ax = plt.subplots(figsize=(9, height))
-    for u, v, weight in graph.edges(data="weight"):
-        (x1, y1), (x2, y2) = position[u], position[v]
-        if frozenset((u, v)) in chosen:
-            ax.plot([x1, x2], [y1, y2], color="#d62728", linewidth=2.2, zorder=2)
-            ax.text(0.5 * (x1 + x2), 0.5 * (y1 + y2), f"{weight:g}", color="#d62728", fontsize=7,
-                    ha="center", va="center", backgroundcolor="white", zorder=3)
-        else:
-            ax.plot([x1, x2], [y1, y2], color="#bbbbbb", linewidth=0.6, zorder=1)
-    for n in operators:
-        x, y = position[n]
-        ax.scatter(x, y, s=60, color="#1f77b4", zorder=4)
-        ax.text(x - 0.03, y, n, ha="right", va="center", fontsize=8)
-    for n in slots:
-        x, y = position[n]
-        ax.scatter(x, y, s=60, color="#2ca02c" if n in matching else "#7f7f7f", marker="s", zorder=4)
-        ax.text(x + 0.03, y, n, ha="left", va="center", fontsize=8)
-    ax.set_xlim(-0.45, 1.75)
-    ax.axis("off")
-    st.pyplot(fig)
-
-    st.caption(f"{len(operators)} operators, {len(slots)} slots, {graph.number_of_edges()} edges; "
-               f"{len(matching)} slots covered, total weight "
-               f"{sum(graph[s][o]['weight'] for s, o in matching.items()):g}. "
-               "This matching only uses the chosen lines and shifts, so it can differ from the full week's plan.")
-
-
 # --- App -----------------------------------------------------------------------
 
-SCREENS = {"Plan": plan_screen, "Schedule": schedule_screen, "Data": data_screen, "Graph": graph_screen}
+SCREENS = {"Plan": plan_screen, "Schedule": schedule_screen, "Data": data_screen}
 
 
 def main() -> None:

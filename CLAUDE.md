@@ -57,7 +57,7 @@ data/                             Simulated data, committed (source/ + history W
                                   them after experimenting. Never read or written by the code; do not plan with
                                   data/backup as data folder.
 main.py         Command line: parses arguments and calls plan_weeks
-app.py          Front end (Streamlit): Plan, Schedule, Data and Graph screens
+app.py          Front end (Streamlit): Plan, Schedule and Data screens
 ```
 
 ## Loader (`library/loader.py`)
@@ -176,7 +176,8 @@ Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only disp
 | Plan | form with start/end year and week (default: the source weeks not in the history yet), objective, overwrite and the six weights; calls `plan_weeks` and shows, per week, assignments, uncovered slots (with candidates), unassigned operators and total weight. Errors and `save_week` warnings are shown in the page |
 | Schedule | a history week as a lines x shifts table with names and roles, coverage against that week's demand (covered / needed), and all assignments with each operator's level on the line |
 | Data | operators with their level per line, lines with their restricted group, and a week's demand and availability |
-| Graph | the bipartite graph of a week limited to the chosen lines and shifts (operators left, slots right), drawn with matplotlib, with the matching's edges in red; for the thesis. Its matching only uses the chosen lines/shifts, so it can differ from the full week's plan |
+
+A Graph screen (bipartite graph of a few lines/shifts, recomputing a partial matching) existed and was removed by user decision: its partial matching could differ from the saved plan.
 
 ## Data model
 
