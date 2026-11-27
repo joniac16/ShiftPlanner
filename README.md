@@ -11,6 +11,7 @@ data/source/    lines.json, operators.json (master data);
                 demands.json, availabilities.json (weekly data, keyed by ISO week)
 data/history/   Planned weeks, one JSON per week (written by the solver, read back for later weeks)
 main.py         Command line entry point (plan_weeks)
+app.py          Web front end (Streamlit)
 ```
 
 ## Usage
@@ -26,6 +27,12 @@ python main.py --start-year 2027 --start-week 5 --end-year 2027 --end-week 8
 ```
 
 Options: `--data-dir`, `--maximize matches|weight`, `--overwrite`, and one option per edge weight (see `python main.py --help`).
+
+Or use the web front end (Plan, Schedule, Data and Graph screens):
+
+```bash
+streamlit run app.py
+```
 
 Run the tests:
 

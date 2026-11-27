@@ -38,6 +38,7 @@ data/
     availabilities.json           Weekly data: operator shifts, keyed by period
   history/<period>.json           Planned weeks: written by the solver, read back for later weeks
 main.py         Command line: parses arguments and calls plan_weeks
+app.py          Front end (Streamlit): Plan, Schedule, Data and Graph screens
 ```
 
 ## Loader (`library/loader.py`)
@@ -134,6 +135,17 @@ Command line (`main.py` only parses arguments and calls `plan_weeks`; it has no 
         [--specialist-as-assistant 2] [--qualified-as-specialist 1]
 
 Exit code 0 and a summary per week (assignments, uncovered slots, unassigned operators, total weight); on DataError, the message and exit code 1.
+
+## Front end (`app.py`)
+
+Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar: screen and data folder (default `data`).
+
+| Screen | Shows |
+|---|---|
+| Plan | form with start/end year and week (default: the source weeks not in the history yet), objective, overwrite and the five weights; calls `plan_weeks` and shows, per week, assignments, uncovered slots (with candidates), unassigned operators and total weight. Errors and `save_week` warnings are shown in the page |
+| Schedule | a history week as a lines x shifts table with names and roles, coverage against that week's demand (covered / needed), and all assignments with each operator's level on the line |
+| Data | operators with their level per line, lines with their restricted group, and a week's demand and availability |
+| Graph | the bipartite graph of a week limited to the chosen lines and shifts (operators left, slots right), drawn with matplotlib, with the matching's edges in red; for the thesis. Its matching only uses the chosen lines/shifts, so it can differ from the full week's plan |
 
 ## Data model
 
