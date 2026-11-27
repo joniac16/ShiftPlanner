@@ -2,6 +2,20 @@
 
 Automatic allocation of factory operators to production lines and shifts, modelled as a **bipartite graph matching** problem and solved with NetworkX. This is a master's thesis (TFM) project: the graph approach was chosen so the theory can be explained in the thesis.
 
+## Branches and environments
+
+| Branch | Environment | Use |
+|---|---|---|
+| `dev` | development | **All work happens here** (new functions, fixes, docs). May be unfinished. |
+| `test` | testing | A version that should already work, to be checked (tests + app) before release. |
+| `main` | production | The stable version. Only receives what has passed through `test`. |
+
+- Changes always flow in one direction: `dev` -> `test` -> `main`, by merge (preferably GitHub Pull Requests).
+- **Never commit directly to `test` or `main`.** If a problem shows up in `test`, fix it in `dev` and merge again.
+- Claude works **only on `dev`** (user decision). Merging `dev` into `test`, or `test` into `main`, is done only when the user asks.
+- All branches contain the whole repository (code, tests, docs, this file). Production is defined by what runs (`app.py`), not by removing files; a clean package can be made with `.gitattributes` `export-ignore` + `git archive` if ever needed.
+- Planned weeks generated in `data/history/` are not committed in any branch (they would travel to `main` with the merges) unless the user asks.
+
 ## Conventions
 
 - Everything committed to the repository is in **English**: code, comments, docstrings, JSON keys and values, README, commit messages.
