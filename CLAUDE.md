@@ -53,9 +53,9 @@ data/                             Simulated data, committed (source/ + history W
     demands.json                  Weekly data: line needs, keyed by period
     availabilities.json           Weekly data: operator shifts, keyed by period
   history/<period>.json           Planned weeks: written by the solver, read back for later weeks
-  backup/source/, backup/history/ Untouched copy of the original source/ and history/ (user request), to restore
-                                  them after experimenting. Never read or written by the code; do not plan with
-                                  data/backup as data folder.
+  backup/1/, backup/2/, backup/3/  Three copies of the original source/ + history/ (user request), to play with:
+                                  each one works as a data folder (e.g. "data/backup/1" in the app's Data
+                                  folder field or --data-dir), and they also allow restoring data/.
 main.py         Command line: parses arguments and calls plan_weeks
 app.py          Front end (Streamlit): Plan assignments, View assignments and View source data screens
 ```
@@ -225,7 +225,7 @@ key and edit what changes.
 ## Sample data (`data/`)
 
 - The simulated data lives directly in `data/` and is committed. Planning with `main.py` or `app.py` writes new history files there; do not commit them unless the user asks.
-- `data/backup/` keeps the original `source/` and `history/`. To restore them: delete `data/source` and `data/history` and copy them back from `data/backup/`. If the original data ever changes on purpose, update the backup too.
+- `data/backup/1`, `2` and `3` each hold a copy of the original `source/` and `history/`, to experiment with (use one as the data folder) without touching `data/`. To restore `data/` or a backup folder, copy `source/` and `history/` back from an untouched one (or from git). If the original data ever changes on purpose, update the backups too.
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
 - Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
