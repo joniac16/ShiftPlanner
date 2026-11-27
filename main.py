@@ -42,8 +42,7 @@ def main(argv: list[str] | None = None) -> int:
     weights = MatchWeights(**{name: getattr(args, name) for name in MatchWeights().__dict__})
 
     if not (Path(args.data_dir) / "source").exists():
-        print(f"Error: no data in {args.data_dir}/source. Copy the sample data first "
-              f"(the contents of sample_data/ into {args.data_dir}/) or use --data-dir.", file=sys.stderr)
+        print(f"Error: no data in {args.data_dir}/source.", file=sys.stderr)
         return 1
 
     try:
