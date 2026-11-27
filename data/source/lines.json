@@ -22,6 +22,7 @@
   {
     "id": "L3",
     "name": "Line 3",
+    "restrictions": {"max_consecutive_weeks": 2, "min_rest_weeks": 2},
     "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 2, "assistant": 1}},

@@ -1,4 +1,4 @@
-"""Data models: Operator, Line, Shift and Staff."""
+"""Data models: Operator, Line, Shift, Staff and Restrictions."""
 
 from dataclasses import dataclass, field
 
@@ -28,7 +28,21 @@ class Operator:
 
 
 @dataclass
+class Restrictions:
+    """Optional limits on how long an operator can stay on a line.
+
+    After working `max_consecutive_weeks` weeks in a row on the line (any shift,
+    any role), the operator must stay off it for at least `min_rest_weeks` weeks.
+    None means no limit.
+    """
+
+    max_consecutive_weeks: int | None = None
+    min_rest_weeks: int | None = None
+
+
+@dataclass
 class Line:
     id: str
     name: str
     shifts: list[Shift] = field(default_factory=list)
+    restrictions: Restrictions = field(default_factory=Restrictions)
