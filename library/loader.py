@@ -154,7 +154,7 @@ def load_availabilities(period: str, data_dir: Path | str = DEFAULT_DATA_DIR) ->
 
 
 def load_history(data_dir: Path | str = DEFAULT_DATA_DIR) -> list[WeekAllocation]:
-    """Read every approved week in history/, in chronological order.
+    """Read every planned week in history/, in chronological order.
 
     Returns an empty list if there are no weeks. Raises DataError if a file's
     name does not match the period inside it, or a role is not valid.

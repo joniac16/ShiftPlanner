@@ -2,7 +2,7 @@
 
 Planning periods are ISO weeks written as "<year>-W<week>", with no leading
 zero ("2027-W5", "2027-W12"). They are used as keys in demands.json and
-availabilities.json and as file names in data/output and data/history.
+availabilities.json and as file names in data/history.
 """
 
 from datetime import date

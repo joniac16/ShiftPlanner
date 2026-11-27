@@ -3,7 +3,7 @@
 Master data (data/source): Line, RestrictedGroup, Operator.
 Weekly data (data/source/demands.json, availabilities.json): LineDemand, Shift,
 Staff, Availability.
-Allocations (data/output, data/history): Assignment, WeekAllocation.
+Allocations (data/history): Assignment, WeekAllocation.
 Solver input: PlanningInput.
 Graph: MatchWeights.
 Solver output: PlanningResult.
@@ -94,7 +94,7 @@ class Assignment:
 
 @dataclass
 class WeekAllocation:
-    """All the assignments of a week (a proposal in data/output or an approved week in data/history)."""
+    """All the assignments of a week, as stored in data/history/<period>.json."""
 
     period: str  # e.g. "2027-W5"
     assignments: list[Assignment] = field(default_factory=list)
@@ -112,7 +112,7 @@ class PlanningInput:
     operators: dict[str, Operator]  # operator id -> Operator
     demands: list[LineDemand]  # lines running this week and their needs
     availabilities: dict[str, Availability]  # operator id -> Availability (missing: not available)
-    history: list[WeekAllocation]  # approved weeks before `period`, oldest first
+    history: list[WeekAllocation]  # planned weeks before `period`, oldest first
 
 
 # --- Graph ---------------------------------------------------------------------
@@ -145,7 +145,7 @@ class PlanningResult:
     A proposal is always returned, even if some slots could not be covered.
     """
 
-    allocation: WeekAllocation  # the proposal (what is saved to data/output)
+    allocation: WeekAllocation  # the week's plan (what is saved to data/history)
     uncovered_slots: dict[str, int]  # slot id -> number of candidate operators it had
     unassigned_operators: list[str]  # available operators who got no slot
     total_weight: float  # sum of the weights of the chosen edges
