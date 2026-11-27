@@ -22,7 +22,7 @@ library/
                 weekly: LineDemand, Shift, Staff, Availability;
                 allocations: Assignment, WeekAllocation; solver input: PlanningInput;
                 graph: MatchWeights; solver output: PlanningResult)
-  utils.py      Small helpers: ensure_data_dir, make_iso_week, next_iso_week, iso_week_to_date, sort_iso_weeks
+  utils.py      Small helpers: make_iso_week, next_iso_week, iso_week_to_date, sort_iso_weeks
   loader.py     Reads the JSON files into models (see "Loader" below)
   graph.py      Builds the bipartite graph from the PlanningInput (see "Solver" below)
   solver.py     Matching with NetworkX (see "Solver" below)
@@ -33,9 +33,9 @@ test/
   graph/, solver/, writer/, planner/ <function>/testX/   same layout
 sample_data/                      Sample (simulated) data, committed: source/ + history W1-W4. Never modified by the app
 data/                             Working folder: in the repository it is EMPTY (only a .gitignore that ignores
-                                  everything in it). main.py / app.py copy sample_data/ into it the first time
-                                  (ensure_data_dir), and all planning happens there, so nothing is ever committed.
-                                  To start again from the samples, delete its contents.
+                                  everything in it). The user copies sample_data/ into it BY HAND (main.py and
+                                  app.py never copy anything; with no data/source they stop with an error).
+                                  All planning happens there, so nothing is ever committed.
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
     demands.json                  Weekly data: line needs, keyed by period
@@ -142,7 +142,7 @@ Exit code 0 and a summary per week (assignments, uncovered slots, unassigned ope
 
 ## Front end (`app.py`)
 
-Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar: screen and data folder (default `data`; if it has no data, the sample data is copied into it).
+Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar: screen and data folder (default `data`; if it has no `source/`, an error asks to copy the sample data first).
 
 | Screen | Shows |
 |---|---|
@@ -196,7 +196,7 @@ key and edit what changes.
 
 ## Sample data (`sample_data/`)
 
-- The sample data lives in `sample_data/` (committed). The working folder `data/` is empty in the repository and ignored by git; `ensure_data_dir` (utils.py) copies `sample_data/` into it when it has no `source/`. Changes to the sample data itself must be made in `sample_data/`.
+- The sample data lives in `sample_data/` (committed). The working folder `data/` is empty in the repository and ignored by git; the user copies `sample_data/` into it by hand (user decision: no automatic copy). Changes to the sample data itself must be made in `sample_data/`.
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
 - Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.

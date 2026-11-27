@@ -11,9 +11,9 @@ sample_data/    Sample (simulated) data:
   source/       lines.json, operators.json (master data);
                 demands.json, availabilities.json (weekly data, keyed by ISO week)
   history/      Planned weeks, one JSON per week (written by the solver, read back for later weeks)
-data/           Working copy, empty in the repository and ignored by git. The first time
-                main.py or app.py runs, sample_data/ is copied into it; all planning
-                happens there. Delete its contents to start again from the samples.
+data/           Working copy, empty in the repository and ignored by git. Copy the
+                contents of sample_data/ into it before the first run; all planning
+                happens there.
 main.py         Command line entry point (plan_weeks)
 app.py          Web front end (Streamlit)
 ```
@@ -23,6 +23,14 @@ app.py          Web front end (Streamlit)
 ```bash
 pip install -r requirements.txt
 ```
+
+Copy the sample data into the working folder (only the first time, or to start again):
+
+```bash
+cp -r sample_data/. data/
+```
+
+On Windows (PowerShell): `Copy-Item -Recurse sample_data\* data\`
 
 Plan a range of weeks and save them to `data/history/`:
 

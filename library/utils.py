@@ -5,28 +5,7 @@ zero ("2027-W5", "2027-W12"). They are used as keys in demands.json and
 availabilities.json and as file names in data/history.
 """
 
-import shutil
 from datetime import date, timedelta
-from pathlib import Path
-
-SAMPLE_DATA_DIR = Path("sample_data")
-
-
-def ensure_data_dir(data_dir: Path | str, sample_dir: Path | str = SAMPLE_DATA_DIR) -> bool:
-    """Make sure the working data folder has data: if `data_dir/source` does
-    not exist, copy the sample data (`sample_data/`: source/ and history/)
-    into `data_dir`. Returns True if it copied the sample data, False if the
-    folder already had data.
-
-    The working folder (`data/` by default) is ignored by git, so planning or
-    editing data there never changes the repository. To start again from the
-    sample data, delete its contents.
-    """
-    data_dir, sample_dir = Path(data_dir), Path(sample_dir)
-    if (data_dir / "source").exists():
-        return False
-    shutil.copytree(sample_dir, data_dir, dirs_exist_ok=True)
-    return True
 
 
 def make_iso_week(year: int, week: int) -> str:
