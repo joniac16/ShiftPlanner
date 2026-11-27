@@ -1,4 +1,19 @@
 [
-  {"id": "L1", "name": "Line 1", "staff_per_shift": 1},
-  {"id": "L2", "name": "Line 2", "staff_per_shift": 1}
+  {
+    "id": "L1",
+    "name": "Line 1",
+    "shifts": [
+      {"name": "Morning",   "staff": {"specialist": 1, "trained": 2, "assistant": 1}},
+      {"name": "Afternoon", "staff": {"specialist": 1, "trained": 2, "assistant": 0}},
+      {"name": "Night",     "staff": {"specialist": 1, "trained": 1, "assistant": 0}},
+      {"name": "Weekend",   "staff": {"specialist": 1, "trained": 1, "assistant": 0}}
+    ]
+  },
+  {
+    "id": "L2",
+    "name": "Line 2",
+    "shifts": [
+      {"name": "Morning", "staff": {"specialist": 1, "trained": 1, "assistant": 2}}
+    ]
+  }
 ]
