@@ -4,8 +4,7 @@
     "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
-      {"name": "Night",     "staff": {"specialist": 1, "qualified": 2, "assistant": 0}},
-      {"name": "Weekend",   "staff": {"specialist": 1, "qualified": 2, "assistant": 0}}
+      {"name": "Night",     "staff": {"specialist": 1, "qualified": 2, "assistant": 0}}
     ]
   },
   {
@@ -13,8 +12,7 @@
     "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
-      {"name": "Night",     "staff": {"specialist": 1, "qualified": 2, "assistant": 0}},
-      {"name": "Weekend",   "staff": {"specialist": 1, "qualified": 2, "assistant": 0}}
+      {"name": "Night",     "staff": {"specialist": 1, "qualified": 2, "assistant": 0}}
     ]
   },
   {

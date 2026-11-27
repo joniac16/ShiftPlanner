@@ -54,7 +54,7 @@ class Staff:
 
 @dataclass
 class Shift:
-    name: str  # e.g. "Morning", "Afternoon", "Night", "Weekend"
+    name: str  # "Morning", "Afternoon" or "Night"
     staff: Staff = field(default_factory=Staff)
 
 

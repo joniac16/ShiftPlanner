@@ -53,10 +53,11 @@ week, copy the previous week's folder and edit what changes.
 {"line": "L1", "shifts": [{"name": "Morning", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}}]}
 ```
 - Shifts the line runs that week (open-ended list) and the exact number of operators of each role each shift needs. A line not listed does not run that week.
+- For now only three shifts are used: `Morning`, `Afternoon`, `Night` (no weekend shift, by decision). The format still allows adding more later.
 
 ### weeks/<period>/availability.json (weekly)
 ```json
-{"operator": "OP1", "shifts": ["Morning", "Weekend"]}
+{"operator": "OP1", "shifts": ["Morning", "Night"]}
 ```
 - Shifts the operator can cover that week. All are treated equally (no regular/volunteer distinction, by decision). Empty list or missing operator = not available (holidays, sick leave...).
 
@@ -71,7 +72,7 @@ week, copy the previous week's folder and edit what changes.
 
 ## Sample data
 
-- 5 lines, 65 operators. Weekly folders 2026-W44 to 2026-W47 (53 positions, history available) and 2026-W48 (51 positions, two absences: OP8, OP27), the first week to be planned by the solver. L3 and L5 form restricted group RG1.
+- 5 lines, 65 operators. Weekly folders 2026-W44 to 2026-W47 (47 positions, history available) and 2026-W48 (48 positions, two absences: OP8, OP27), the first week to be planned by the solver. L3 and L5 form restricted group RG1.
 - Sample data must stay **feasible**: whenever master data, weekly data or rules change, check with OR-Tools that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
 - When planning the next week, the solver must take the end of `history.json` into account for restricted groups (e.g. an operator with two consecutive weeks in RG1 must rest).
 
@@ -82,4 +83,4 @@ week, copy the previous week's folder and edit what changes.
 
 ## Ideas discussed, not implemented
 
-- Fair distribution of nights/weekends using history, global night-shift rotation (possibly in a future `rules.json`), hard vs. soft constraints (soft ones as penalties in the objective).
+- Weekend shift (removed for now), fair distribution of nights using history, global night-shift rotation (possibly in a future `rules.json`), hard vs. soft constraints (soft ones as penalties in the objective).
