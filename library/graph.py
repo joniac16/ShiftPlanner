@@ -152,3 +152,29 @@ def build_operator_set(data: PlanningInput) -> dict[str, dict]:
         operator_set[operator_id] = {"shifts": list(availability.shifts), "lines": lines}
 
     return operator_set
+
+
+SLOT_ROLES = ("specialist", "qualified", "assistant")
+
+
+def build_slot_set(data: PlanningInput) -> dict[str, dict]:
+    """Build the slot side of the bipartite graph for `data.period`.
+
+    Each position needed in `data.demands` becomes one slot (one graph node), so
+    a shift that needs 2 qualified operators gives 2 qualified slots.
+
+    Result: slot id -> {"line": ..., "shift": ..., "role": ...}, with ids like
+    "L1-Morning-qualified-2" (numbered from 1, no leading zeros). Roles with 0
+    positions give no slot. Order: lines and shifts as in the demands, and
+    within a shift specialist, qualified, assistant.
+    """
+    slot_set: dict[str, dict] = {}
+
+    for demand in data.demands:
+        for shift in demand.shifts:
+            for role in SLOT_ROLES:
+                for number in range(1, getattr(shift.staff, role) + 1):
+                    slot_id = f"{demand.line}-{shift.name}-{role}-{number}"
+                    slot_set[slot_id] = {"line": demand.line, "shift": shift.name, "role": role}
+
+    return slot_set
