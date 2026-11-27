@@ -6,9 +6,10 @@ Automatic allocation of factory operators to production lines and shifts, using 
 
 - Everything committed to the repository is in **English**: code, comments, docstrings, JSON keys and values, README, commit messages.
 - **Never write numbers with leading zeros** (ids `OP1`, `L1`, periods `2027-W5`, file names `2027-W5.json`), by user preference.
+- **Work step by step, one function at a time**, as the user asks. Do only what is requested in each step; if something else seems needed (other files, extra functions, data changes), say so and ask before doing it.
 - Python package with the project functions: `library/`.
-- Unit tests (pytest): one folder per function in `tests/unit_testing/<function>/`, containing `test_<function>.py` and, when the function needs input files, a `data/` folder with small fake data made for that test. Tests must check that the function's result is coherent, and must never read `data/`.
-- Every new function in `library/` gets its own test folder.
+- Unit tests (pytest) live in `test/<module>/<function>/`: a `test_<function>.py` file and a `data/` folder with dummy data made for that test. `data/` mirrors the layout of the real `data/` folder (`source/`, `history/`), so the function under test receives the test's `data/` folder as its data directory. Tests must check that the function's result is coherent, and must never read the real `data/`.
+- Every new function in `library/` gets its own test folder, except the small helpers in `library/utils.py`, which have no tests (user decision).
 - Run tests with `python -m pytest` (configured in `pytest.ini`). Dependencies: `pip install -r requirements.txt`.
 - All data in the repository is simulated for now (no real personal data).
 
@@ -17,12 +18,15 @@ Automatic allocation of factory operators to production lines and shifts, using 
 ```
 library/
   models.py     Dataclasses (master: Line, RestrictedGroup, Operator;
-                weekly: LineDemand, Shift, Staff, Availability)
-  periods.py    ISO week helpers ("2026-W48"): parse, format, next, weeks_between, sort
-  loader.py     (empty) read/write the JSON files
+                weekly: LineDemand, Shift, Staff, Availability;
+                allocations: Assignment, WeekAllocation; solver input: PlanningInput)
+  utils.py      Small helpers: iso_week_to_date, sort_iso_weeks
+  loader.py     (empty) planned: load_lines, load_operators, load_demands,
+                load_availabilities, load_history and load_planning_input
+                (builds the PlanningInput for the solver)
   solver.py     (empty) OR-Tools allocation logic
-tests/
-  unit_testing/<function>/        test_<function>.py (+ data/ if needed)
+test/
+  loader/<function>/              test_<function>.py + data/ (dummy data)
 data/
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
@@ -81,7 +85,7 @@ key and edit what changes.
 ```
 - One file per week. `data/output/` holds proposals; `data/history/` holds what was actually used.
 - Stores the `role`, so later training changes in `operators.json` do not alter the past.
-- Periods are ISO weeks as strings `YYYY-W<n>` with no leading zero (`2027-W5`, `2027-W12`). They do **not** sort chronologically as text, so always sort with `sort_periods`. Never do integer arithmetic on them; use `library/periods.py` (some years have 53 ISO weeks, e.g. 2026).
+- Periods are ISO weeks as strings `YYYY-W<n>` with no leading zero (`2027-W5`, `2027-W12`). They do **not** sort chronologically as text, so always sort with `sort_iso_weeks` (`library/utils.py`). Never do integer arithmetic on them; convert with `iso_week_to_date` (some years have 53 ISO weeks, e.g. 2026).
 - Only ids are stored; names and training come from `operators.json`.
 
 ## Sample data
