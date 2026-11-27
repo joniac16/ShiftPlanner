@@ -6,6 +6,7 @@ Staff, Availability.
 Allocations (data/output, data/history): Assignment, WeekAllocation.
 Solver input: PlanningInput.
 Graph: MatchWeights.
+Solver output: PlanningResult.
 """
 
 from dataclasses import dataclass, field
@@ -132,3 +133,19 @@ class MatchWeights:
     qualified_as_assistant: float = 3  # waste of training
     specialist_as_assistant: float = 2  # waste of training
     qualified_as_specialist: float = 1  # last resort
+
+
+# --- Solver output -------------------------------------------------------------
+
+
+@dataclass
+class PlanningResult:
+    """What the solver returns for a week: the proposal and a short report.
+
+    A proposal is always returned, even if some slots could not be covered.
+    """
+
+    allocation: WeekAllocation  # the proposal (what is saved to data/output)
+    uncovered_slots: dict[str, int]  # slot id -> number of candidate operators it had
+    unassigned_operators: list[str]  # available operators who got no slot
+    total_weight: float  # sum of the weights of the chosen edges

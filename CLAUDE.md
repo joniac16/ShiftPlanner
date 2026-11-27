@@ -20,13 +20,14 @@ library/
   models.py     Dataclasses (master: Line, RestrictedGroup, Operator;
                 weekly: LineDemand, Shift, Staff, Availability;
                 allocations: Assignment, WeekAllocation; solver input: PlanningInput;
-                graph: MatchWeights)
+                graph: MatchWeights; solver output: PlanningResult)
   utils.py      Small helpers: iso_week_to_date, sort_iso_weeks
   loader.py     Reads the JSON files into models (see "Loader" below)
   graph.py      Builds the bipartite graph from the PlanningInput (see "Solver" below)
-  solver.py     (empty) matching with NetworkX
+  solver.py     Matching with NetworkX (see "Solver" below)
 test/
   loader/<function>/testX/        test_X_<function>.py + data/ (dummy data)
+  graph/<function>/testX/, solver/<function>/testX/   same layout
 data/
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
@@ -90,7 +91,17 @@ Both sets are plain dicts (id -> attributes), ready for `G.add_nodes_from(set.it
 
 Each function has its tests in `test/graph/<function>/testX/`.
 
-Planned next (solver.py): `PlanningResult` model (allocation, uncovered slots, unassigned operators, total weight), `find_matching`, `build_allocation`, `solve`. The uncovered-slots report starts simple (number of candidates per uncovered slot); a Hall's theorem explanation is a possible later improvement.
+### solver.py
+
+| Function | Returns |
+|---|---|
+| `find_matching(graph, maximize_matches=True)` | dict slot id -> operator id (order of the slots in the graph), from `networkx.max_weight_matching(graph, maxcardinality=maximize_matches)` |
+
+`PlanningResult` (models.py), the output of `solve`: `allocation` (WeekAllocation, the proposal), `uncovered_slots` (slot id -> number of candidate operators it had), `unassigned_operators` (available operators who got no slot), `total_weight`.
+
+Planned next: `build_allocation` (matching -> WeekAllocation, role = slot role) and `solve(data, weights=None, maximize_matches=True)` -> PlanningResult. The uncovered-slots report starts simple (number of candidates); a Hall's theorem explanation is a possible later improvement.
+
+Simulated week 2027-W5: 48 of 48 slots covered, all with the exact level (total weight 480, a few ms).
 
 ## Workflow (planned, implemented with the solver)
 
