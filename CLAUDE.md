@@ -80,8 +80,13 @@ Approach: bipartite graph, maximum-cardinality matching with maximum total weigh
 |---|---|
 | `get_blocked_groups(data)` | operator id -> set of restricted group ids they are blocked from that week |
 | `build_operator_set(data)` | operator id -> `{"shifts": [...], "lines": {line id: [roles]}}`: available operators, every running line they can go to with **all the slot roles** they can take there (following the assignment rules, `ALLOWED_ROLES`), blocked lines removed; operators with no shifts or no possible line left out |
+| `build_slot_set(data)` | slot id -> `{"line", "shift", "role"}`: one slot (graph node) per position needed in the week's demands, ids like `L1-Morning-qualified-2` (numbered from 1); roles with 0 positions give no slot; order of the demands, then specialist, qualified, assistant |
 
-Planned next: the slot set, the edges with weights and the graph. Tests for `graph.py` are not written yet.
+Both sets are plain dicts (id -> attributes), ready for `G.add_nodes_from(set.items(), bipartite=0/1)`; no extra model is needed. Operator and slot ids never clash (`OP1` vs `L1-...`).
+
+Each function has its tests in `test/graph/<function>/testX/`.
+
+Planned next: the edges with weights and the graph.
 
 ## Workflow (planned, implemented with the solver)
 
