@@ -29,7 +29,7 @@ python main.py --start-year 2027 --start-week 5 --end-year 2027 --end-week 8
 
 Options: `--data-dir`, `--maximize matches|weight`, `--overwrite`, and one option per edge weight (see `python main.py --help`).
 
-Or use the web front end (Plan, Schedule and Data screens):
+Or use the web front end (screens: Plan assignments, View assignments, View source data):
 
 ```bash
 streamlit run app.py

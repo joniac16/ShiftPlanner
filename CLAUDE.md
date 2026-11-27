@@ -57,7 +57,7 @@ data/                             Simulated data, committed (source/ + history W
                                   them after experimenting. Never read or written by the code; do not plan with
                                   data/backup as data folder.
 main.py         Command line: parses arguments and calls plan_weeks
-app.py          Front end (Streamlit): Plan, Schedule and Data screens
+app.py          Front end (Streamlit): Plan assignments, View assignments and View source data screens
 ```
 
 ## Loader (`library/loader.py`)
@@ -169,13 +169,13 @@ Exit code 0 and a summary per week (assignments, uncovered slots, unassigned ope
 
 ## Front end (`app.py`)
 
-Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar: screen and data folder (default `data`; if it has no `source/`, it only shows an error saying there is no data).
+Streamlit app, started with `streamlit run app.py`. Like `main.py`, it only displays data and calls `library/` functions, so it has no tests. Its texts are in English (repository convention). Sidebar menu (screen names chosen by the user; each screen's title matches its menu name) and data folder (default `data`; if it has no `source/`, it only shows an error saying there is no data).
 
 | Screen | Shows |
 |---|---|
-| Plan | form with start/end year and week (default: the source weeks not in the history yet), objective, overwrite and the six weights; calls `plan_weeks` and shows, per week, assignments, uncovered slots (with candidates), unassigned operators and total weight. Errors and `save_week` warnings are shown in the page |
-| Schedule | a history week as a lines x shifts table with names and roles, coverage against that week's demand (covered / needed), and all assignments with each operator's level on the line |
-| Data | operators with their level per line, lines with their restricted group, and a week's demand and availability |
+| Plan assignments | form with start/end year and week (default: the source weeks not in the history yet), objective, overwrite and the six weights; calls `plan_weeks` and shows, per week, assignments, uncovered slots (with candidates), unassigned operators and total weight. Errors and `save_week` warnings are shown in the page |
+| View assignments | a history week as a lines x shifts table with names and roles, coverage against that week's demand (covered / needed), and all assignments with each operator's level on the line |
+| View source data | operators with their level per line, lines with their restricted group, and a week's demand and availability |
 
 A Graph screen (bipartite graph of a few lines/shifts, recomputing a partial matching) existed and was removed by user decision: its partial matching could differ from the saved plan.
 

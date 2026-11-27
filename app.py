@@ -4,11 +4,12 @@ Run it with:
     streamlit run app.py
 
 Three screens, chosen in the sidebar:
-  - Plan:     choose the range of weeks, the objective, overwrite and weights,
-              run `plan_weeks` and see the report of every week.
-  - Schedule: one week of the history as a table of lines x shifts.
-  - Data:     operators and their training, lines, and each week's demand
-              and availability.
+  - Plan assignments:  choose the range of weeks, the objective, overwrite
+                       and weights, run `plan_weeks` and see the report of
+                       every week.
+  - View assignments:  one week of the history as a table of lines x shifts.
+  - View source data:  operators and their training, lines, and each week's
+                       demand and availability.
 
 The app only displays data and calls functions of `library/`; all the logic
 (and its tests) lives there.
@@ -72,7 +73,7 @@ def weights_form(key: str) -> MatchWeights:
 
 
 def plan_screen(data_dir: Path) -> None:
-    st.header("Plan weeks")
+    st.header("Plan assignments")
     st.write("Plans every week of the range in order and saves them to the history, "
              "only if all of them can be planned.")
 
@@ -138,7 +139,7 @@ def plan_screen(data_dir: Path) -> None:
 
 
 def schedule_screen(data_dir: Path) -> None:
-    st.header("Schedule")
+    st.header("View assignments")
     history = load_history(data_dir)
     if not history:
         st.info("The history is empty.")
@@ -192,7 +193,7 @@ def schedule_screen(data_dir: Path) -> None:
 
 
 def data_screen(data_dir: Path) -> None:
-    st.header("Data")
+    st.header("View source data")
     try:
         lines = load_lines(data_dir)
         operators = load_operators(data_dir)
@@ -240,7 +241,11 @@ def data_screen(data_dir: Path) -> None:
 
 # --- App -----------------------------------------------------------------------
 
-SCREENS = {"Plan": plan_screen, "Schedule": schedule_screen, "Data": data_screen}
+SCREENS = {
+    "Plan assignments": plan_screen,
+    "View assignments": schedule_screen,
+    "View source data": data_screen,
+}
 
 
 def main() -> None:
