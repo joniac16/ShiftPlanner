@@ -2,6 +2,16 @@
 
 Automatic allocation of factory staff to production lines and shifts, modelled as a maximum-weight matching in a bipartite graph (operators and slots), solved with [NetworkX](https://networkx.org/).
 
+## Online apps (Streamlit Community Cloud)
+
+| Branch | Environment | App |
+|---|---|---|
+| `main` | production | <https://shiftplanner-zwrt9xfbaj6xbarynitodx.streamlit.app> |
+| `test` | testing | <https://shiftplanner-yyfr3xq9qox3qnm4zkqvyt.streamlit.app> |
+| `dev` | development | <https://shiftplanner-nk7dbykj2bjhw5sy6l7vug.streamlit.app> |
+
+Each app runs `app.py` from its branch. Changes flow `dev` -> `test` -> `main`. Weeks planned in an online app are lost when the app restarts.
+
 ## Structure
 
 ```

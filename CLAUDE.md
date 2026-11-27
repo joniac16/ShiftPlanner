@@ -4,11 +4,11 @@ Automatic allocation of factory operators to production lines and shifts, modell
 
 ## Branches and environments
 
-| Branch | Environment | Use |
-|---|---|---|
-| `dev` | development | **All work happens here** (new functions, fixes, docs). May be unfinished. |
-| `test` | testing | A version that should already work, to be checked (tests + app) before release. |
-| `main` | production | The stable version. Only receives what has passed through `test`. |
+| Branch | Environment | Use | Streamlit app (runs `app.py` of the branch) |
+|---|---|---|---|
+| `dev` | development | **All work happens here** (new functions, fixes, docs). May be unfinished. | https://shiftplanner-nk7dbykj2bjhw5sy6l7vug.streamlit.app |
+| `test` | testing | A version that should already work, to be checked (tests + app) before release. | https://shiftplanner-yyfr3xq9qox3qnm4zkqvyt.streamlit.app |
+| `main` | production | The stable version. Only receives what has passed through `test`. | https://shiftplanner-zwrt9xfbaj6xbarynitodx.streamlit.app |
 
 - Changes always flow in one direction: `dev` -> `test` -> `main`, by merge (preferably GitHub Pull Requests).
 - **Never commit directly to `test` or `main`.** If a problem shows up in `test`, fix it in `dev` and merge again.
