@@ -1,4 +1,4 @@
 [
-  {"id": "OP1", "name": "Ana", "enabled_lines": ["L1", "L2"]},
-  {"id": "OP2", "name": "Luis", "enabled_lines": ["L1"]}
+  {"id": "OP1", "name": "Ana García López", "enabled_lines": ["L1", "L2"]},
+  {"id": "OP2", "name": "Luis Martínez Ruiz", "enabled_lines": ["L1"]}
 ]
