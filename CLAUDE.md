@@ -21,12 +21,10 @@ library/
                 weekly: LineDemand, Shift, Staff, Availability;
                 allocations: Assignment, WeekAllocation; solver input: PlanningInput)
   utils.py      Small helpers: iso_week_to_date, sort_iso_weeks
-  loader.py     (empty) planned: load_lines, load_operators, load_demands,
-                load_availabilities, load_history and load_planning_input
-                (builds the PlanningInput for the solver)
+  loader.py     Reads the JSON files into models (see "Loader" below)
   solver.py     (empty) OR-Tools allocation logic
 test/
-  loader/<function>/              test_<function>.py + data/ (dummy data)
+  loader/<function>/              test_<function>.py + data/ (dummy data), one per loader function
 data/
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
@@ -36,6 +34,23 @@ data/
   history/<period>.json           Approved allocations (read by the solver)
 main.py         Entry point (placeholder)
 ```
+
+## Loader (`library/loader.py`)
+
+Every function takes the data folder as a parameter (`data` by default); tests pass their own `data/` folder. Errors in the data raise `DataError` with a clear message.
+
+| Function | Returns | Raises DataError if |
+|---|---|---|
+| `load_lines(data_dir)` | `dict[str, Line]` | repeated line id; lines of the same restricted group with different limits |
+| `load_operators(data_dir)` | `dict[str, Operator]` | repeated operator id; training level not `specialist`/`qualified` |
+| `load_demands(period, data_dir)` | `list[LineDemand]` (that week only) | week not in the file; line twice in the week; unknown role in `staff` |
+| `load_availabilities(period, data_dir)` | `dict[str, Availability]` (that week only) | week not in the file; operator twice in the week |
+| `load_history(data_dir)` | `list[WeekAllocation]`, chronological (`sort_iso_weeks`) | file name does not match the period inside; invalid role |
+| `load_planning_input(period, data_dir)` | `PlanningInput` for the solver | operator trained on, or demand for, an unknown line; availability for an unknown operator |
+
+`load_planning_input` calls the other five and keeps only the history weeks **before** `period`.
+
+Tests cover the valid case of each function (expected result compared with `==`, result printed to the console; run with `python -m pytest -v -s`). **Error cases are not tested yet**: it is still to be decided how to organise several dummy data sets per test folder. Writing allocations (`save_proposal`, `approve`) is not implemented yet.
 
 ## Workflow (planned, implemented with the solver)
 
@@ -56,7 +71,7 @@ key and edit what changes.
 ```json
 {"id": "L3", "name": "Line 3", "restricted_group": {"id": "RG1", "max_consecutive_weeks": 2, "min_rest_weeks": 2}}
 ```
-- `restricted_group` is optional (absent = no restriction). Weeks worked on **any** line of the same group (any shift, any role) count together: after `max_consecutive_weeks` in a row in the group, the operator must stay off all its lines for at least `min_rest_weeks`. All lines of a group must declare the same values; `loader.py` should validate this.
+- `restricted_group` is optional (absent = no restriction). Weeks worked on **any** line of the same group (any shift, any role) count together: after `max_consecutive_weeks` in a row in the group, the operator must stay off all its lines for at least `min_rest_weeks`. All lines of a group must declare the same values; `load_lines` validates this.
 
 ### operators.json (master)
 ```json
