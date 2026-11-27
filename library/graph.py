@@ -42,6 +42,14 @@ from library.utils import iso_week_to_date
 
 ONE_WEEK = timedelta(weeks=1)
 
+# Slot roles an operator can take on a line, by their level on it (see the
+# assignment rules above). Order: from the most to the least natural option.
+ALLOWED_ROLES = {
+    "specialist": ["specialist", "qualified", "assistant"],
+    "qualified": ["qualified", "specialist", "assistant"],
+    None: ["assistant"],  # no training on the line
+}
+
 
 def get_blocked_groups(data: PlanningInput) -> dict[str, set[str]]:
     """Return the restricted groups each operator is blocked from in `data.period`.
@@ -105,11 +113,14 @@ def get_blocked_groups(data: PlanningInput) -> dict[str, set[str]]:
 def build_operator_set(data: PlanningInput) -> dict[str, dict]:
     """Build the operator side of the bipartite graph for `data.period`.
 
-    Result: operator id -> {"shifts": [...], "lines": {line id: level}}, where
+    Result: operator id -> {"shifts": [...], "lines": {line id: [roles]}}, where
       - "shifts" are the shifts the operator can cover that week,
       - "lines" are all the lines running that week (in demands) the operator
-        can go to, with their level on each one: "specialist" or "qualified"
-        from their training, "assistant" if they have no training on it.
+        can go to, with every slot role they can take on each one, following
+        the assignment rules (`ALLOWED_ROLES`):
+            specialist on the line -> ["specialist", "qualified", "assistant"]
+            qualified on the line  -> ["qualified", "specialist", "assistant"]
+            no training on it      -> ["assistant"]
         Lines of restricted groups the operator is blocked from (see
         `get_blocked_groups`) are left out.
 
@@ -127,12 +138,13 @@ def build_operator_set(data: PlanningInput) -> dict[str, dict]:
             continue
 
         blocked_groups = blocked.get(operator_id, set())
-        lines: dict[str, str] = {}
+        lines: dict[str, list[str]] = {}
         for line_id in running_lines:
             group = data.lines[line_id].restricted_group
             if group is not None and group.id in blocked_groups:
                 continue
-            lines[line_id] = operator.lines.get(line_id, "assistant")
+            level = operator.lines.get(line_id)
+            lines[line_id] = list(ALLOWED_ROLES[level])
 
         if not lines:
             continue

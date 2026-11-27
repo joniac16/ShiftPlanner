@@ -79,7 +79,7 @@ Approach: bipartite graph, maximum-cardinality matching with maximum total weigh
 | Function | Returns |
 |---|---|
 | `get_blocked_groups(data)` | operator id -> set of restricted group ids they are blocked from that week |
-| `build_operator_set(data)` | operator id -> `{"shifts": [...], "lines": {line id: level}}`: available operators, every running line they can go to with their level (`assistant` if untrained), blocked lines removed; operators with no shifts or no possible line left out |
+| `build_operator_set(data)` | operator id -> `{"shifts": [...], "lines": {line id: [roles]}}`: available operators, every running line they can go to with **all the slot roles** they can take there (following the assignment rules, `ALLOWED_ROLES`), blocked lines removed; operators with no shifts or no possible line left out |
 
 Planned next: the slot set, the edges with weights and the graph. Tests for `graph.py` are not written yet.
 

@@ -14,7 +14,7 @@ from library.loader import load_planning_input
 DATA_DIR = Path(__file__).parent / "data"
 
 EXPECTED = {
-    "OP2": {"shifts": ["Morning"], "lines": {"L2": "assistant"}},
+    "OP2": {"shifts": ["Morning"], "lines": {"L2": ["assistant"]}},
 }
 
 
