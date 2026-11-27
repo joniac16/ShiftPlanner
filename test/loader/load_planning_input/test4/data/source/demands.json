@@ -1,0 +1,7 @@
+{
+  "2027-W3": [
+    {"line": "L1", "shifts": [
+      {"name": "Morning", "staff": {"specialist": 1, "qualified": 0, "assistant": 0}}
+    ]}
+  ]
+}

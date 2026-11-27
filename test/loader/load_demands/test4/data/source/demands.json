@@ -1,0 +1,7 @@
+{
+  "2027-W1": [
+    {"line": "L1", "shifts": [
+      {"name": "Morning", "staff": {"specialist": 1, "supervisor": 1}}
+    ]}
+  ]
+}
