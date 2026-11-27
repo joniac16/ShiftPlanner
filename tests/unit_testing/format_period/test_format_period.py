@@ -5,12 +5,12 @@ from datetime import date
 from library.periods import format_period, parse_period
 
 
-def test_pads_week_number_to_two_digits():
-    assert format_period(date(2027, 2, 1)) == "2027-W05"
+def test_week_number_has_no_leading_zero():
+    assert format_period(date(2027, 2, 1)) == "2027-W5"
 
 
 def test_any_day_of_the_week_gives_the_same_period():
-    assert {format_period(date(2027, 2, d)) for d in range(1, 8)} == {"2027-W05"}
+    assert {format_period(date(2027, 2, d)) for d in range(1, 8)} == {"2027-W5"}
 
 
 def test_uses_iso_year_not_calendar_year():
@@ -19,10 +19,9 @@ def test_uses_iso_year_not_calendar_year():
 
 
 def test_round_trip_with_parse_period():
-    for period in ["2026-W01", "2026-W53", "2027-W05", "2027-W52"]:
+    for period in ["2026-W1", "2026-W53", "2027-W5", "2027-W52"]:
         assert format_period(parse_period(period)) == period
 
 
-def test_periods_sort_chronologically_as_text():
-    periods = [format_period(date(2027, m, 1)) for m in range(1, 13)]
-    assert sorted(periods) == periods
+def test_two_digit_week_number():
+    assert format_period(date(2027, 3, 8)) == "2027-W10"

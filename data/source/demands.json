@@ -1,5 +1,5 @@
 {
-  "2027-W01": [
+  "2027-W1": [
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
@@ -23,7 +23,7 @@
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
     ]}
   ],
-  "2027-W02": [
+  "2027-W2": [
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
@@ -47,7 +47,7 @@
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
     ]}
   ],
-  "2027-W03": [
+  "2027-W3": [
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
@@ -71,7 +71,7 @@
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
     ]}
   ],
-  "2027-W04": [
+  "2027-W4": [
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
@@ -95,7 +95,7 @@
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
     ]}
   ],
-  "2027-W05": [
+  "2027-W5": [
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
@@ -119,7 +119,7 @@
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
     ]}
   ],
-  "2027-W06": [
+  "2027-W6": [
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
@@ -143,7 +143,7 @@
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
     ]}
   ],
-  "2027-W07": [
+  "2027-W7": [
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
@@ -167,7 +167,7 @@
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
     ]}
   ],
-  "2027-W08": [
+  "2027-W8": [
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},

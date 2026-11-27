@@ -8,12 +8,12 @@ from library.periods import parse_period
 
 
 def test_returns_monday_of_the_week():
-    assert parse_period("2027-W05") == date(2027, 2, 1)
+    assert parse_period("2027-W5") == date(2027, 2, 1)
 
 
 def test_first_week_can_start_in_previous_year():
     # ISO week 1 of 2026 starts on Monday 29 December 2025.
-    assert parse_period("2026-W01") == date(2025, 12, 29)
+    assert parse_period("2026-W1") == date(2025, 12, 29)
 
 
 def test_week_53_in_a_year_that_has_it():

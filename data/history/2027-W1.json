@@ -1,5 +1,5 @@
 {
-  "period": "2027-W01",
+  "period": "2027-W1",
   "assignments": [
     {"operator": "OP33", "line": "L1", "shift": "Morning",   "role": "specialist"},
     {"operator": "OP21", "line": "L1", "shift": "Morning",   "role": "qualified"},

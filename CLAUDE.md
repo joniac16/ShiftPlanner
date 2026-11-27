@@ -5,6 +5,7 @@ Automatic allocation of factory operators to production lines and shifts, using 
 ## Conventions
 
 - Everything committed to the repository is in **English**: code, comments, docstrings, JSON keys and values, README, commit messages.
+- **Never write numbers with leading zeros** (ids `OP1`, `L1`, periods `2027-W5`, file names `2027-W5.json`), by user preference.
 - Python package with the project functions: `library/`.
 - Unit tests (pytest): one folder per function in `tests/unit_testing/<function>/`, containing `test_<function>.py` and, when the function needs input files, a `data/` folder with small fake data made for that test. Tests must check that the function's result is coherent, and must never read `data/`.
 - Every new function in `library/` gets its own test folder.
@@ -17,7 +18,7 @@ Automatic allocation of factory operators to production lines and shifts, using 
 library/
   models.py     Dataclasses (master: Line, RestrictedGroup, Operator;
                 weekly: LineDemand, Shift, Staff, Availability)
-  periods.py    ISO week helpers ("2026-W48"): parse, format, next, weeks_between
+  periods.py    ISO week helpers ("2026-W48"): parse, format, next, weeks_between, sort
   loader.py     (empty) read/write the JSON files
   solver.py     (empty) OR-Tools allocation logic
 tests/
@@ -43,7 +44,7 @@ Proposals and history files have the same format, so approving is copying the fi
 ## Data model
 
 Master data changes rarely; weekly data changes every week. `demands.json` and
-`availabilities.json` are objects keyed by ISO week (`{"2027-W05": [...], ...}`).
+`availabilities.json` are objects keyed by ISO week (`{"2027-W5": [...], ...}`).
 To prepare a new week, copy the previous week's block in both files, change the
 key and edit what changes.
 
@@ -63,31 +64,31 @@ key and edit what changes.
 
 ### demands.json (weekly)
 ```json
-{"2027-W05": [{"line": "L1", "shifts": [{"name": "Morning", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}}]}]}
+{"2027-W5": [{"line": "L1", "shifts": [{"name": "Morning", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}}]}]}
 ```
 - Shifts the line runs that week (open-ended list) and the exact number of operators of each role each shift needs. A line not listed does not run that week.
 - For now only three shifts are used: `Morning`, `Afternoon`, `Night` (no weekend shift, by decision). The format still allows adding more later.
 
 ### availabilities.json (weekly)
 ```json
-{"2027-W05": [{"operator": "OP1", "shifts": ["Morning", "Night"]}]}
+{"2027-W5": [{"operator": "OP1", "shifts": ["Morning", "Night"]}]}
 ```
 - Shifts the operator can cover that week. All are treated equally (no regular/volunteer distinction, by decision). Empty list or missing operator = not available (holidays, sick leave...).
 
 ### history/<period>.json and output/<period>.json
 ```json
-{"period": "2027-W01", "assignments": [{"operator": "OP33", "line": "L1", "shift": "Morning", "role": "specialist"}]}
+{"period": "2027-W1", "assignments": [{"operator": "OP33", "line": "L1", "shift": "Morning", "role": "specialist"}]}
 ```
 - One file per week. `data/output/` holds proposals; `data/history/` holds what was actually used.
 - Stores the `role`, so later training changes in `operators.json` do not alter the past.
-- Periods are ISO weeks as strings `YYYY-Www` (zero-padded, sorts chronologically). Never do integer arithmetic on them; use `library/periods.py` (some years have 53 ISO weeks, e.g. 2026).
+- Periods are ISO weeks as strings `YYYY-W<n>` with no leading zero (`2027-W5`, `2027-W12`). They do **not** sort chronologically as text, so always sort with `sort_periods`. Never do integer arithmetic on them; use `library/periods.py` (some years have 53 ISO weeks, e.g. 2026).
 - Only ids are stored; names and training come from `operators.json`.
 
 ## Sample data
 
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
-- History: 2027-W01 to 2027-W04 (47 positions each), with their demands and availabilities.
-- Weeks to plan: 2027-W05 to 2027-W08 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
+- History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
+- Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
 - Sample data must stay **feasible**: whenever master data, weekly data or rules change, check with OR-Tools that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
 - When planning the next week, the solver must take the latest weeks in `data/history/` into account for restricted groups (e.g. an operator with two consecutive weeks in RG1 must rest).
 

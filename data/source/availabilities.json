@@ -1,5 +1,5 @@
 {
-  "2027-W01": [
+  "2027-W1": [
     {"operator": "OP1", "shifts": ["Morning"]},
     {"operator": "OP2", "shifts": ["Night"]},
     {"operator": "OP3", "shifts": ["Morning", "Night"]},
@@ -66,7 +66,7 @@
     {"operator": "OP64", "shifts": ["Afternoon", "Night"]},
     {"operator": "OP65", "shifts": ["Morning", "Night"]}
   ],
-  "2027-W02": [
+  "2027-W2": [
     {"operator": "OP1", "shifts": ["Morning"]},
     {"operator": "OP2", "shifts": ["Night"]},
     {"operator": "OP3", "shifts": ["Morning", "Night"]},
@@ -133,7 +133,7 @@
     {"operator": "OP64", "shifts": ["Afternoon", "Night"]},
     {"operator": "OP65", "shifts": ["Morning", "Night"]}
   ],
-  "2027-W03": [
+  "2027-W3": [
     {"operator": "OP1", "shifts": ["Morning"]},
     {"operator": "OP2", "shifts": ["Night"]},
     {"operator": "OP3", "shifts": ["Morning", "Night"]},
@@ -200,7 +200,7 @@
     {"operator": "OP64", "shifts": ["Afternoon", "Night"]},
     {"operator": "OP65", "shifts": ["Morning", "Night"]}
   ],
-  "2027-W04": [
+  "2027-W4": [
     {"operator": "OP1", "shifts": ["Morning"]},
     {"operator": "OP2", "shifts": ["Night"]},
     {"operator": "OP3", "shifts": ["Morning", "Night"]},
@@ -267,7 +267,7 @@
     {"operator": "OP64", "shifts": ["Afternoon", "Night"]},
     {"operator": "OP65", "shifts": ["Morning", "Night"]}
   ],
-  "2027-W05": [
+  "2027-W5": [
     {"operator": "OP1", "shifts": ["Morning"]},
     {"operator": "OP2", "shifts": ["Night"]},
     {"operator": "OP3", "shifts": ["Morning", "Night"]},
@@ -334,7 +334,7 @@
     {"operator": "OP64", "shifts": ["Afternoon", "Night"]},
     {"operator": "OP65", "shifts": ["Morning", "Night"]}
   ],
-  "2027-W06": [
+  "2027-W6": [
     {"operator": "OP1", "shifts": ["Morning"]},
     {"operator": "OP2", "shifts": ["Night"]},
     {"operator": "OP3", "shifts": ["Morning", "Night"]},
@@ -401,7 +401,7 @@
     {"operator": "OP64", "shifts": ["Afternoon", "Night"]},
     {"operator": "OP65", "shifts": ["Morning", "Night"]}
   ],
-  "2027-W07": [
+  "2027-W7": [
     {"operator": "OP1", "shifts": ["Morning"]},
     {"operator": "OP2", "shifts": ["Night"]},
     {"operator": "OP3", "shifts": ["Morning", "Night"]},
@@ -468,7 +468,7 @@
     {"operator": "OP64", "shifts": ["Afternoon", "Night"]},
     {"operator": "OP65", "shifts": ["Morning", "Night"]}
   ],
-  "2027-W08": [
+  "2027-W8": [
     {"operator": "OP1", "shifts": ["Morning"]},
     {"operator": "OP2", "shifts": ["Night"]},
     {"operator": "OP3", "shifts": ["Morning", "Night"]},
