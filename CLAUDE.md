@@ -26,7 +26,7 @@ Automatic allocation of factory operators to production lines and shifts, modell
 - Every new function in `library/` gets its own test folder, except the small helpers in `library/utils.py`, which have no tests (user decision).
 - Tests of functions that **write files** (e.g. `save_week`) write into their own `testX/data/` folder, so the result can be opened after the run: the test first deletes the file it is going to generate (to always start from the same state), and a `.gitignore` next to it lists that file so it is never committed.
 - Run tests with `python -m pytest` (configured in `pytest.ini`). Dependencies: `pip install -r requirements.txt`.
-- All data in the repository is simulated for now (no real personal data).
+- `data/` is the place for the real data. For now it holds simulated data (no real personal data); tests always use their own dummy data.
 
 ## Structure
 
@@ -45,9 +45,9 @@ library/
 test/
   loader/<function>/testX/        test_X_<function>.py + data/ (dummy data)
   graph/, solver/, writer/, planner/ <function>/testX/   same layout
-data/                             Simulated data, committed (source/ + history W1-W4). The app and main.py read
-                                  and write here: planning adds files to data/history/ (user decision: no
-                                  separate sample_data/ folder and no .gitignore in data/).
+data/                             The real data (for now simulated), committed: source/ + history W1-W4. The
+                                  app and main.py read and write here by default: planning adds files to
+                                  data/history/. There is no separate "sample data" concept (user decision).
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
     demands.json                  Weekly data: line needs, keyed by period
@@ -198,7 +198,7 @@ key and edit what changes.
 ```
 - Ids are `OP<n>` with no leading zeros.
 - `lines` is the operator's training: line id -> `"specialist"` or `"qualified"`. A line not listed can only be covered as `"assistant"` (no training, there to help or learn).
-- Sample names are famous historical figures (no living people).
+- The current (simulated) operators are named after famous historical figures (no living people).
 
 ### demands.json (weekly)
 ```json
@@ -222,14 +222,16 @@ key and edit what changes.
 - Periods are ISO weeks as strings `YYYY-W<n>` with no leading zero (`2027-W5`, `2027-W12`). They do **not** sort chronologically as text, so always sort with `sort_iso_weeks` (`library/utils.py`). Never do integer arithmetic on them; convert with `iso_week_to_date` (some years have 53 ISO weeks, e.g. 2026).
 - Only ids are stored; names and training come from `operators.json`.
 
-## Sample data (`data/`)
+## Data (`data/`) and backups
 
-- The simulated data lives directly in `data/` and is committed. Planning with `main.py` or `app.py` writes new history files there; do not commit them unless the user asks.
-- `data/backup/1`, `2` and `3` each hold a copy of the original `source/` and `history/`, to experiment with (use one as the data folder) without touching `data/`. To restore `data/` or a backup folder, copy `source/` and `history/` back from an untouched one (or from git). If the original data ever changes on purpose, update the backups too.
+- `data/` holds the real data (`source/` + `history/`); today its content is simulated. It is committed. Planning with `main.py` or `app.py` writes new history files there; do not commit them unless the user asks.
+- `data/backup/1`, `2` and `3` each hold a copy of `data/source/` and `data/history/`, **to play and test with** (use one as the data folder, e.g. `data/backup/1`) without touching `data/`. To reset a backup folder, copy `source/` and `history/` back from `data/` or another untouched folder (or from git). If `data/` changes on purpose, refresh the backups if needed.
+
+Current content (simulated):
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
 - Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
-- Sample data must stay **feasible**: whenever master data, weekly data or rules change, check (e.g. with a quick matching script) that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
+- The simulated data must stay **feasible**: whenever master data, weekly data or rules change, check (e.g. with a quick matching script) that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
 - When planning the next week, the solver must take the latest weeks in the history into account for restricted groups (e.g. an operator with two consecutive weeks in RG1 must rest).
 
 ## Ideas discussed, not implemented

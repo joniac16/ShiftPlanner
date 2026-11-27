@@ -17,10 +17,12 @@ Each app runs `app.py` from its branch. Changes flow `dev` -> `test` -> `main`. 
 ```
 library/        Project functions (models, JSON loading, solver)
 test/           Unit tests (pytest): <module>/<function>/ with test file and dummy data
-data/           Simulated data:
+data/           The data used by the app and main.py (for now, simulated data):
   source/       lines.json, operators.json (master data);
                 demands.json, availabilities.json (weekly data, keyed by ISO week)
   history/      Planned weeks, one JSON per week (written by the solver, read back for later weeks)
+  backup/1, 2, 3  Copies of source/ and history/ to play and test with (use one as the
+                data folder: --data-dir data/backup/1, or the app's "Data folder" field)
 main.py         Command line entry point (plan_weeks)
 app.py          Web front end (Streamlit)
 ```
