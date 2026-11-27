@@ -56,7 +56,8 @@ Tests: `test1` is the valid case of each function (expected result compared with
 
 ## Solver (decisions)
 
-Approach: bipartite graph, maximum-cardinality matching with maximum total weight (`networkx.max_weight_matching(G, maxcardinality=True)`): first cover as many slots as possible, then prefer the heaviest assignments. Implemented with **NetworkX only** (no own matching algorithm). `networkx` is not in `requirements.txt` yet.
+Approach: bipartite graph, maximum-cardinality matching with maximum total weight (`networkx.max_weight_matching(G, maxcardinality=True)`): first cover as many slots as possible, then prefer the heaviest assignments. Implemented with **NetworkX only** (no own matching algorithm; `networkx` is in `requirements.txt`).
+- Planned solver signature: `solve(data, weights=None, maximize_matches=True)`. `maximize_matches=True` -> maximum number of covered slots, then maximum weight among those (`maxcardinality=True`); `False` -> maximum weight only, even if fewer slots are covered.
 
 - Left side: operators available that week (`build_operator_set`). Right side: slots, one node per position (e.g. 2 qualified needed -> 2 slots). Edges: an operator can take a slot, with a weight.
 - **Each operator covers at most one slot per week.**
@@ -83,12 +84,13 @@ Approach: bipartite graph, maximum-cardinality matching with maximum total weigh
 | `build_operator_set(data)` | operator id -> `{"shifts": [...], "lines": {line id: [roles]}}`: available operators, every running line they can go to with **all the slot roles** they can take there (following the assignment rules, `ALLOWED_ROLES`), blocked lines removed; operators with no shifts or no possible line left out |
 | `build_slot_set(data)` | slot id -> `{"line", "shift", "role"}`: one slot (graph node) per position needed in the week's demands, ids like `L1-Morning-qualified-2` (numbered from 1); roles with 0 positions give no slot; order of the demands, then specialist, qualified, assistant |
 | `build_edges(data, operator_set, slot_set, weights=None)` | list of `(operator id, slot id, weight)`, ready for `G.add_weighted_edges_from`: an edge when the slot's shift is in the operator's shifts, its line in the operator's lines and its role among the operator's roles there; weight by operator level (from `data.operators`) and slot role, using `MatchWeights` (defaults if None) |
+| `build_graph(data, weights=None)` | `networkx.Graph`: operator nodes (`bipartite=0`, attributes `shifts`, `lines`), slot nodes (`bipartite=1`, attributes `line`, `shift`, `role`; slots with no candidate included, with no edges) and the weighted edges (`weight` attribute) |
 
 Both sets are plain dicts (id -> attributes), ready for `G.add_nodes_from(set.items(), bipartite=0/1)`; no extra model is needed. Operator and slot ids never clash (`OP1` vs `L1-...`).
 
 Each function has its tests in `test/graph/<function>/testX/`.
 
-Planned next: the graph (NetworkX) and the matching.
+Planned next (solver.py): `PlanningResult` model (allocation, uncovered slots, unassigned operators, total weight), `find_matching`, `build_allocation`, `solve`. The uncovered-slots report starts simple (number of candidates per uncovered slot); a Hall's theorem explanation is a possible later improvement.
 
 ## Workflow (planned, implemented with the solver)
 

@@ -37,6 +37,8 @@ the group.
 
 from datetime import date, timedelta
 
+import networkx as nx
+
 from library.models import MatchWeights, PlanningInput
 from library.utils import iso_week_to_date
 
@@ -232,3 +234,26 @@ def build_edges(
             edges.append((operator_id, slot_id, weight_by_level_and_role[(level, slot["role"])]))
 
     return edges
+
+
+def build_graph(data: PlanningInput, weights: MatchWeights | None = None) -> nx.Graph:
+    """Build the weighted bipartite graph of `data.period`.
+
+    Nodes:
+      - operators (`build_operator_set`), with attribute bipartite=0 and their
+        options ("shifts", "lines") as attributes,
+      - slots (`build_slot_set`), with attribute bipartite=1 and "line",
+        "shift", "role" as attributes. Slots no operator can take are included
+        too (with no edges), so they show up as uncovered.
+    Edges: `build_edges`, with their weight in the "weight" attribute.
+    `weights` defaults to `MatchWeights()`.
+    """
+    operator_set = build_operator_set(data)
+    slot_set = build_slot_set(data)
+    edges = build_edges(data, operator_set, slot_set, weights)
+
+    graph = nx.Graph()
+    graph.add_nodes_from(operator_set.items(), bipartite=0)
+    graph.add_nodes_from(slot_set.items(), bipartite=1)
+    graph.add_weighted_edges_from(edges)
+    return graph
