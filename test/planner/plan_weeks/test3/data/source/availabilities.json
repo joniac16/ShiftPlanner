@@ -1,0 +1,10 @@
+{
+  "2027-W5": [
+    {"operator": "OP1", "shifts": ["Morning"]},
+    {"operator": "OP2", "shifts": ["Morning"]}
+  ],
+  "2027-W6": [
+    {"operator": "OP1", "shifts": ["Morning"]},
+    {"operator": "OP2", "shifts": ["Morning"]}
+  ]
+}

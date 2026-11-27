@@ -10,13 +10,25 @@ test/           Unit tests (pytest): <module>/<function>/ with test file and dum
 data/source/    lines.json, operators.json (master data);
                 demands.json, availabilities.json (weekly data, keyed by ISO week)
 data/history/   Planned weeks, one JSON per week (written by the solver, read back for later weeks)
-main.py         Entry point
+main.py         Command line entry point (plan_weeks)
 ```
 
 ## Usage
 
 ```bash
 pip install -r requirements.txt
-python main.py
-pytest
+```
+
+Plan a range of weeks and save them to `data/history/`:
+
+```bash
+python main.py --start-year 2027 --start-week 5 --end-year 2027 --end-week 8
+```
+
+Options: `--data-dir`, `--maximize matches|weight`, `--overwrite`, and one option per edge weight (see `python main.py --help`).
+
+Run the tests:
+
+```bash
+python -m pytest -v -s
 ```

@@ -22,21 +22,22 @@ library/
                 weekly: LineDemand, Shift, Staff, Availability;
                 allocations: Assignment, WeekAllocation; solver input: PlanningInput;
                 graph: MatchWeights; solver output: PlanningResult)
-  utils.py      Small helpers: iso_week_to_date, sort_iso_weeks
+  utils.py      Small helpers: make_iso_week, next_iso_week, iso_week_to_date, sort_iso_weeks
   loader.py     Reads the JSON files into models (see "Loader" below)
   graph.py      Builds the bipartite graph from the PlanningInput (see "Solver" below)
   solver.py     Matching with NetworkX (see "Solver" below)
   writer.py     Writes the algorithm's results: save_week -> data/history/<period>.json
+  planner.py    plan_weeks: plans a range of weeks in a row (see "Planning several weeks")
 test/
   loader/<function>/testX/        test_X_<function>.py + data/ (dummy data)
-  graph/<function>/testX/, solver/<function>/testX/, writer/<function>/testX/   same layout
+  graph/, solver/, writer/, planner/ <function>/testX/   same layout
 data/
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
     demands.json                  Weekly data: line needs, keyed by period
     availabilities.json           Weekly data: operator shifts, keyed by period
   history/<period>.json           Planned weeks: written by the solver, read back for later weeks
-main.py         Entry point (placeholder)
+main.py         Command line: parses arguments and calls plan_weeks
 ```
 
 ## Loader (`library/loader.py`)
@@ -115,17 +116,24 @@ In `uncovered_slots`, 0 candidates means nobody could take the slot; more than 0
 
 Simulated week 2027-W5 with `solve`: 48 of 48 slots covered, all with the exact level (total weight 480, a few ms); 15 of the 63 available operators left unassigned.
 
-## Workflow (planned)
+## Planning several weeks (`library/planner.py`, `main.py`)
 
-There is no `data/output/` folder and no separate approval step (user decision): the solver's plan for a week is saved **directly** to `data/history/<period>.json` with `writer.save_week`, which validates it first. To change a planned week, edit its history file (or save it again with `overwrite=True`).
+`plan_weeks(start_year, start_week, end_year, end_week, data_dir="data", weights=None, maximize_matches=True, overwrite=False)` -> list of `PlanningResult` (one per week). It is the loop used by `main.py` and meant to be called directly by a future front end (weeks are given as year + week number, by user choice, to make the front end easier).
 
-    data = load_planning_input("2027-W5")
-    result = solve(data)
-    save_week(result.allocation)
+1. Loads the whole history into memory. If a week of the range is already in it and `overwrite` is False -> DataError before planning anything; with `overwrite`, those weeks are dropped from the in-memory history (the old versions are not used).
+2. Week by week: `load_planning_input`, replace its history with the in-memory one (weeks before it), `solve`, `validate_week`, and append the allocation to the in-memory history, so the next week sees it (restricted groups).
+3. Only if every week was planned, saves them all with `save_week` (all or nothing: if a week fails, DataError says which one and **no file is written**).
 
-- Weeks must be planned **in order**: planning week N+1 reads week N from the history (restricted groups).
-- Saving a week that already exists needs `overwrite=True`. If later weeks were already planned, `save_week` warns (they were computed with the old version) but saves anyway.
-- `main.py` is not being written for now.
+There is no `data/output/` folder and no separate approval step (user decision): planned weeks go straight to `data/history/`. To change a planned week, edit its file or plan it again with `overwrite`. When overwriting a range, `save_week` warns about later weeks that the same run is about to replace (harmless; left as is for now).
+
+Command line (`main.py` only parses arguments and calls `plan_weeks`; it has no tests):
+
+    python main.py --start-year 2027 --start-week 5 --end-year 2027 --end-week 8
+        [--data-dir data] [--maximize matches|weight] [--overwrite]
+        [--exact 10] [--specialist-as-qualified 6] [--qualified-as-assistant 3]
+        [--specialist-as-assistant 2] [--qualified-as-specialist 1]
+
+Exit code 0 and a summary per week (assignments, uncovered slots, unassigned operators, total weight); on DataError, the message and exit code 1.
 
 ## Data model
 

@@ -1,0 +1,4 @@
+[
+  {"id": "L1", "name": "Line 1", "restricted_group": {"id": "RG1", "max_consecutive_weeks": 1, "min_rest_weeks": 1}},
+  {"id": "L2", "name": "Line 2"}
+]

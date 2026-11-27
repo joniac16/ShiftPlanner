@@ -5,7 +5,22 @@ zero ("2027-W5", "2027-W12"). They are used as keys in demands.json and
 availabilities.json and as file names in data/history.
 """
 
-from datetime import date
+from datetime import date, timedelta
+
+
+def make_iso_week(year: int, week: int) -> str:
+    """Build an ISO week text from its year and week number: (2027, 5) -> "2027-W5".
+
+    Raises ValueError if the week does not exist (e.g. week 53 of 2027).
+    """
+    date.fromisocalendar(year, week, 1)  # validates
+    return f"{year}-W{week}"
+
+
+def next_iso_week(iso_week: str) -> str:
+    """Return the following ISO week: "2027-W5" -> "2027-W6", "2026-W53" -> "2027-W1"."""
+    year, week, _ = (iso_week_to_date(iso_week) + timedelta(weeks=1)).isocalendar()
+    return f"{year}-W{week}"
 
 
 def iso_week_to_date(iso_week: str) -> date:
