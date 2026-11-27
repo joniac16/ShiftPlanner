@@ -1,6 +1,6 @@
 # ShiftPlanner
 
-Automatic allocation of factory operators to production lines and shifts, using Google OR-Tools (CP-SAT).
+Automatic allocation of factory operators to production lines and shifts, modelled as a **bipartite graph matching** problem and solved with NetworkX. This is a master's thesis (TFM) project: the graph approach was chosen so the theory can be explained in the thesis.
 
 ## Conventions
 
@@ -8,7 +8,7 @@ Automatic allocation of factory operators to production lines and shifts, using 
 - **Never write numbers with leading zeros** (ids `OP1`, `L1`, periods `2027-W5`, file names `2027-W5.json`), by user preference.
 - **Work step by step, one function at a time**, as the user asks. Do only what is requested in each step; if something else seems needed (other files, extra functions, data changes), say so and ask before doing it.
 - Python package with the project functions: `library/`.
-- Unit tests (pytest) live in `test/<module>/<function>/`: a `test_<function>.py` file and a `data/` folder with dummy data made for that test. `data/` mirrors the layout of the real `data/` folder (`source/`, `history/`), so the function under test receives the test's `data/` folder as its data directory. Tests must check that the function's result is coherent, and must never read the real `data/`.
+- Unit tests (pytest) live in `test/<module>/<function>/testX/` (`test1`, `test2`, ...: one folder per case; test1 is the valid case, the others usually error cases). Each `testX/` has a `test_X_<function>.py` file (e.g. `test_2_load_lines.py`; file names must be unique for pytest) and a `data/` folder with dummy data made for that case. `data/` mirrors the layout of the real `data/` folder (`source/`, `history/`), so the function under test receives the test's `data/` folder as its data directory. Tests must check that the function's result is coherent, and must never read the real `data/`.
 - Every new function in `library/` gets its own test folder, except the small helpers in `library/utils.py`, which have no tests (user decision).
 - Run tests with `python -m pytest` (configured in `pytest.ini`). Dependencies: `pip install -r requirements.txt`.
 - All data in the repository is simulated for now (no real personal data).
@@ -22,9 +22,10 @@ library/
                 allocations: Assignment, WeekAllocation; solver input: PlanningInput)
   utils.py      Small helpers: iso_week_to_date, sort_iso_weeks
   loader.py     Reads the JSON files into models (see "Loader" below)
-  solver.py     (empty) OR-Tools allocation logic
+  graph.py      Builds the bipartite graph from the PlanningInput (see "Solver" below)
+  solver.py     (empty) matching with NetworkX
 test/
-  loader/<function>/              test_<function>.py + data/ (dummy data), one per loader function
+  loader/<function>/testX/        test_X_<function>.py + data/ (dummy data)
 data/
   source/                         Input prepared by the user
     lines.json, operators.json    Master data (change rarely)
@@ -50,7 +51,37 @@ Every function takes the data folder as a parameter (`data` by default); tests p
 
 `load_planning_input` calls the other five and keeps only the history weeks **before** `period`.
 
-Tests cover the valid case of each function (expected result compared with `==`, result printed to the console; run with `python -m pytest -v -s`). **Error cases are not tested yet**: it is still to be decided how to organise several dummy data sets per test folder. Writing allocations (`save_proposal`, `approve`) is not implemented yet.
+Tests: `test1` is the valid case of each function (expected result compared with `==`, result printed to the console); `test2`, `test3`... check each `DataError` (and that an empty history returns `[]`). Run with `python -m pytest -v -s`. Writing allocations (`save_proposal`, `approve`) is not implemented yet.
+
+## Solver (decisions)
+
+Approach: bipartite graph, maximum-cardinality matching with maximum total weight (`networkx.max_weight_matching(G, maxcardinality=True)`): first cover as many slots as possible, then prefer the heaviest assignments. Implemented with **NetworkX only** (no own matching algorithm). `networkx` is not in `requirements.txt` yet.
+
+- Left side: operators available that week (`build_operator_set`). Right side: slots, one node per position (e.g. 2 qualified needed -> 2 slots). Edges: an operator can take a slot, with a weight.
+- **Each operator covers at most one slot per week.**
+- **Always return a proposal**, even if not every slot can be covered; report the uncovered slots.
+- **Assignment rules** (operator level on the line -> slots they can take):
+
+  | Operator level on the line | Can take a slot of |
+  |---|---|
+  | specialist | specialist, qualified, assistant |
+  | qualified | qualified, specialist (last resort), assistant |
+  | no training on that line | assistant only |
+
+  Any operator can be an assistant on any running line, but it wastes training, so it should only happen when operators are left over.
+- **Weights** are parameters, easy to change to experiment (proposed defaults: exact 10, specialist as qualified 6, qualified as assistant 3, specialist as assistant 2, qualified as specialist 1). Weights only decide among matchings that cover the same number of slots.
+- **Restricted groups block every role**: an operator who must rest from a group cannot go to any of its lines, not even as an assistant. Rule (`get_blocked_groups`): blocked if the last run of consecutive weeks in the group lasted at least `max_consecutive_weeks` and fewer than `min_rest_weeks` weeks have passed since it ended. A week with no history counts as not worked.
+- The history stores the **role of the slot** taken, not the operator's level.
+- New models (slots, weights) go in `models.py`.
+
+### graph.py
+
+| Function | Returns |
+|---|---|
+| `get_blocked_groups(data)` | operator id -> set of restricted group ids they are blocked from that week |
+| `build_operator_set(data)` | operator id -> `{"shifts": [...], "lines": {line id: level}}`: available operators, every running line they can go to with their level (`assistant` if untrained), blocked lines removed; operators with no shifts or no possible line left out |
+
+Planned next: the slot set, the edges with weights and the graph. Tests for `graph.py` are not written yet.
 
 ## Workflow (planned, implemented with the solver)
 
@@ -108,14 +139,9 @@ key and edit what changes.
 - 5 lines, 65 operators. L3 and L5 form restricted group RG1.
 - History: 2027-W1 to 2027-W4 (47 positions each), with their demands and availabilities.
 - Weeks to plan: 2027-W5 to 2027-W8 (48 positions each, identical copies for now; two absences: OP8, OP27). They have been checked to be feasible when planned in sequence after the history.
-- Sample data must stay **feasible**: whenever master data, weekly data or rules change, check with OR-Tools that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
+- Sample data must stay **feasible**: whenever master data, weekly data or rules change, check (e.g. with a quick matching or OR-Tools script) that every week can be fully covered and that the history complies with all rules, using each week's own demand and availability (coverage, availability, roles, one assignment per operator per week, restricted groups). Restricted groups need a wide enough trained pool to rotate.
 - When planning the next week, the solver must take the latest weeks in `data/history/` into account for restricted groups (e.g. an operator with two consecutive weeks in RG1 must rest).
-
-## Open questions (ask the user before writing the solver)
-
-1. Can an operator cover more than one shift in the same week? Sample data and history assume **at most one**.
-2. Can a position be covered by a higher level (specialist in a qualified slot, qualified in an assistant slot)? Sample data assumes **exact roles only**.
 
 ## Ideas discussed, not implemented
 
-- Weekend shift (removed for now), fair distribution of nights using history, global night-shift rotation (possibly in a future `rules.json`), hard vs. soft constraints (soft ones as penalties in the objective).
+- Weekend shift (removed for now), fair distribution of nights using history, global night-shift rotation, operators that do not want to coincide, planning several weeks at once. These do not fit a plain bipartite matching; they are future work / limitations to mention in the thesis (a constraint solver such as OR-Tools CP-SAT would handle them).
