@@ -99,7 +99,7 @@
     {"line": "L1", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
       {"name": "Afternoon", "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
-      {"name": "Night",     "staff": {"specialist": 1, "qualified": 2, "assistant": 0}}
+      {"name": "Night",     "staff": {"specialist": 4, "qualified": 2, "assistant": 0}}
     ]},
     {"line": "L2", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 3, "assistant": 1}},
@@ -117,6 +117,9 @@
     ]},
     {"line": "L5", "shifts": [
       {"name": "Morning",   "staff": {"specialist": 1, "qualified": 2, "assistant": 1}}
+    ]},
+    {"line": "L6", "shifts": [
+      {"name": "Morning",   "staff": {"specialist": 1, "qualified": 0, "assistant": 0}}
     ]}
   ],
   "2027-W6": [

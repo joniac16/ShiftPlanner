@@ -3,5 +3,6 @@
   {"id": "L2", "name": "Line 2"},
   {"id": "L3", "name": "Line 3", "restricted_group": {"id": "RG1", "max_consecutive_weeks": 2, "min_rest_weeks": 2}},
   {"id": "L4", "name": "Line 4"},
-  {"id": "L5", "name": "Line 5", "restricted_group": {"id": "RG1", "max_consecutive_weeks": 2, "min_rest_weeks": 2}}
+  {"id": "L5", "name": "Line 5", "restricted_group": {"id": "RG1", "max_consecutive_weeks": 2, "min_rest_weeks": 2}},
+  {"id": "L6", "name": "Line 6"}
 ]
