@@ -8,8 +8,9 @@ Three screens, chosen in the sidebar:
                        and weights, run `plan_weeks` and see the report of
                        every week; download the planned weeks (.zip, or one
                        .json per week).
-  - View assignments:  one week of the history as a table of lines x shifts;
-                       download that week's .json.
+  - View assignments:  one week of the history as a table of lines x shifts,
+                       its coverage (cells not fully covered in red); download
+                       that week's .json.
   - View source data:  operators and their training, lines, and each week's
                        demand and availability.
 
@@ -217,15 +218,30 @@ def schedule_screen(data_dir: Path) -> None:
         for a in week.assignments:
             covered[(a.line, a.shift, a.role)] = covered.get((a.line, a.shift, a.role), 0) + 1
         rows = []
+        short: list[tuple[int, str]] = []  # (row, role) cells with fewer operators than needed
         for d in demands:
             for s in d.shifts:
                 row = {"line": d.line, "shift": s.name}
                 for role in ROLE_ORDER:
                     needed = getattr(s.staff, role)
-                    row[role] = f"{covered.get((d.line, s.name, role), 0)} / {needed}" if needed else "-"
+                    got = covered.get((d.line, s.name, role), 0)
+                    row[role] = f"{got} / {needed}" if needed else "-"
+                    if got < needed:
+                        short.append((len(rows), role))
                 rows.append(row)
+
+        def highlight_short(table: pd.DataFrame) -> pd.DataFrame:
+            styles = pd.DataFrame("", index=table.index, columns=table.columns)
+            for row, role in short:
+                styles.loc[row, role] = "background-color: #f8d7da; color: #842029; font-weight: bold"
+            return styles
+
         st.write("Coverage (covered / needed):")
-        st.dataframe(pd.DataFrame(rows), hide_index=True)
+        if short:
+            st.caption(f"In red: {len(short)} cell(s) not fully covered.")
+        # Tall enough to show every row, so no red cell is hidden behind a scroll.
+        st.dataframe(pd.DataFrame(rows).style.apply(highlight_short, axis=None), hide_index=True,
+                     height=35 * (len(rows) + 1) + 3)
 
     with st.expander("All assignments, with each operator's level on the line"):
         st.dataframe(pd.DataFrame([{
