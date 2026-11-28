@@ -61,6 +61,13 @@ def shift_sort_key(shift: str):
     return (SHIFT_ORDER.index(shift) if shift in SHIFT_ORDER else len(SHIFT_ORDER), shift)
 
 
+def full_table(table) -> None:
+    """Show a table (DataFrame or Styler) tall enough for every row, so there is
+    no vertical scroll inside it."""
+    rows = len(table.data) if hasattr(table, "data") else len(table)
+    st.dataframe(table, hide_index=True, height=35 * (rows + 1) + 3)
+
+
 def week_file(data_dir: Path, period: str) -> Path:
     """Path of a planned week in the history: <data_dir>/history/<period>.json."""
     return data_dir / "history" / f"{period}.json"
@@ -239,9 +246,8 @@ def schedule_screen(data_dir: Path) -> None:
         st.write("Coverage (covered / needed):")
         if short:
             st.caption(f"In red: {len(short)} cell(s) not fully covered.")
-        # Tall enough to show every row, so no red cell is hidden behind a scroll.
-        st.dataframe(pd.DataFrame(rows).style.apply(highlight_short, axis=None), hide_index=True,
-                     height=35 * (len(rows) + 1) + 3)
+        # Every row visible, so no red cell is hidden behind a scroll.
+        full_table(pd.DataFrame(rows).style.apply(highlight_short, axis=None))
 
     with st.expander("All assignments, with each operator's level on the line"):
         st.dataframe(pd.DataFrame([{
@@ -265,17 +271,17 @@ def data_screen(data_dir: Path) -> None:
 
     with tab_operators:
         st.write(f"{len(operators)} operators. Level on each line (empty: no training, assistant only).")
-        st.dataframe(pd.DataFrame([
+        full_table(pd.DataFrame([
             {"id": o.id, "name": o.name, **{line_id: o.lines.get(line_id, "") for line_id in lines}}
-            for o in operators.values()]), hide_index=True)
+            for o in operators.values()]))
 
     with tab_lines:
-        st.dataframe(pd.DataFrame([{
+        full_table(pd.DataFrame([{
             "id": line.id, "name": line.name,
             "restricted group": line.restricted_group.id if line.restricted_group else "",
             "max consecutive weeks": line.restricted_group.max_consecutive_weeks if line.restricted_group else None,
             "min rest weeks": line.restricted_group.min_rest_weeks if line.restricted_group else None,
-        } for line in lines.values()]), hide_index=True)
+        } for line in lines.values()]))
 
     with tab_week:
         weeks = source_weeks(data_dir)
@@ -285,9 +291,9 @@ def data_screen(data_dir: Path) -> None:
         period = st.selectbox("Week", weeks, key="data-week")
         data = load_planning_input(period, data_dir)
         st.subheader("Demand")
-        st.dataframe(pd.DataFrame([
+        full_table(pd.DataFrame([
             {"line": d.line, "shift": s.name, **{role: getattr(s.staff, role) for role in ROLE_ORDER}}
-            for d in data.demands for s in d.shifts]), hide_index=True)
+            for d in data.demands for s in d.shifts]))
         st.subheader("Availability")
         rows = []
         for o in operators.values():
@@ -296,7 +302,7 @@ def data_screen(data_dir: Path) -> None:
             rows.append({"id": o.id, "name": o.name, "shifts": ", ".join(shifts) or "not available"})
         absent = sum(1 for r in rows if r["shifts"] == "not available")
         st.write(f"{len(rows) - absent} available, {absent} not available.")
-        st.dataframe(pd.DataFrame(rows), hide_index=True)
+        full_table(pd.DataFrame(rows))
 
 
 # --- App -----------------------------------------------------------------------
