@@ -9,8 +9,9 @@ Three screens, chosen in the sidebar:
                        every week; download the planned weeks (.zip, or one
                        .json per week).
   - View assignments:  one week of the history as a table of lines x shifts,
-                       its coverage (cells not fully covered in red); download
-                       that week's .json.
+                       its coverage (cells not fully covered in red) and all
+                       its assignments (qualified operators in specialist
+                       slots in yellow); download that week's .json.
   - View source data:  operators and their training, lines, and each week's
                        demand and availability.
 
@@ -250,12 +251,22 @@ def schedule_screen(data_dir: Path) -> None:
         full_table(pd.DataFrame(rows).style.apply(highlight_short, axis=None))
 
     with st.expander("All assignments, with each operator's level on the line"):
-        st.dataframe(pd.DataFrame([{
+        assignments = pd.DataFrame([{
             "operator": a.operator,
             "name": operators[a.operator].name if a.operator in operators else "?",
             "line": a.line, "shift": a.shift, "role (slot)": a.role,
             "level on the line": operators[a.operator].lines.get(a.line, "no training") if a.operator in operators else "?",
-        } for a in week.assignments]), hide_index=True)
+        } for a in week.assignments])
+        # Qualified operators covering a specialist slot (the last-resort option).
+        last_resort = (assignments["role (slot)"] == "specialist") & (assignments["level on the line"] == "qualified")
+
+        def highlight_last_resort(row: pd.Series) -> list[str]:
+            style = "background-color: #fff3cd; color: #664d03" if last_resort[row.name] else ""
+            return [style] * len(row)
+
+        if last_resort.any():
+            st.caption(f"In yellow: {int(last_resort.sum())} qualified operator(s) covering a specialist slot.")
+        full_table(assignments.style.apply(highlight_last_resort, axis=1))
 
 
 def data_screen(data_dir: Path) -> None:
