@@ -6,14 +6,16 @@ Run it with:
 Three screens, chosen in the sidebar:
   - Plan assignments:  choose the range of weeks, the objective, overwrite
                        and weights, run `plan_weeks` and see the report of
-                       every week; download the planned weeks (.zip, or one
-                       .json per week).
+                       every week (uncovered slots, and the unassigned
+                       operators as a table with their shifts and training);
+                       download the planned weeks (.zip, or one .json per
+                       week).
   - View assignments:  one week of the history as a table of lines x shifts,
                        its coverage (cells not fully covered in red) and all
                        its assignments (qualified operators in specialist
                        slots in yellow); download that week's .json.
   - View source data:  operators and their training, lines, and each week's
-                       demand and availability.
+                       demand and availability (every table shown whole).
 
 The app only displays data and calls functions of `library/`; all the logic
 (and its tests) lives there.
