@@ -29,7 +29,15 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from library.loader import DataError, load_demands, load_history, load_lines, load_operators, load_planning_input
+from library.loader import (
+    DataError,
+    load_availabilities,
+    load_demands,
+    load_history,
+    load_lines,
+    load_operators,
+    load_planning_input,
+)
 from library.models import MatchWeights
 from library.planner import plan_weeks
 from library.utils import iso_week_to_date, sort_iso_weeks
@@ -162,7 +170,7 @@ def plan_screen(data_dir: Path) -> None:
         mime="application/zip", type="primary", on_click="ignore",
     )
 
-    names = {o.id: o.name for o in load_operators(data_dir).values()}
+    operators = load_operators(data_dir)
     for result in results:
         allocation = result.allocation
         title, button = st.columns([4, 1], vertical_alignment="bottom")
@@ -184,7 +192,19 @@ def plan_screen(data_dir: Path) -> None:
                 hide_index=True)
         if result.unassigned_operators:
             with st.expander("Unassigned operators"):
-                st.write(", ".join(f"{o} ({names.get(o, '?')})" for o in result.unassigned_operators))
+                availabilities = load_availabilities(allocation.period, data_dir)
+                rows = []
+                for operator_id in result.unassigned_operators:
+                    operator = operators.get(operator_id)
+                    availability = availabilities.get(operator_id)
+                    rows.append({
+                        "operator": operator_id,
+                        "name": operator.name if operator else "?",
+                        "available shifts": ", ".join(availability.shifts) if availability else "",
+                        "training": ", ".join(f"{line}: {level}" for line, level in operator.lines.items())
+                                    if operator and operator.lines else "no training",
+                    })
+                full_table(pd.DataFrame(rows))
 
 
 def schedule_screen(data_dir: Path) -> None:
